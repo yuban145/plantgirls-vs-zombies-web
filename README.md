@@ -2,7 +2,7 @@
 
 **原作者：庄不纯。** 原游戏为《植物娘大战僵尸 HD 1.3.2》。本仓库是非官方网页移植与修复版本，原作及素材署名归原作者和各自权利人；完整说明见 [CREDITS.txt](public/CREDITS.txt)。
 
-把 `D:\逆向\PlantGirlsVsZombies`（MonoGame / C# 的《植物娘大战僵尸 HD 1.3.2》，基于开源的 **Lawn** 引擎）
+把 （MonoGame / C# 的《植物娘大战僵尸 HD 1.3.2》，基于开源的 **Lawn** 引擎）
 移植成可在浏览器运行的网页游戏。技术栈：**TypeScript + Canvas2D + Vite**，植物娘角色使用官方
 **Spine 4.2 runtime**（`@esotericsoftware/spine-webgl`），其余动画沿用原游戏的 PvZ **Reanim** 格式。
 
