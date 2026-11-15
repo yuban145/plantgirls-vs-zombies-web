@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="author" content="原作者：庄不纯；非官方网页移植版" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Ctext y=%2226%22 font-size=%2226%22%3E%F0%9F%8C%B1%3C/text%3E%3C/svg%3E" /><title>植物娘大战僵尸 · 网页移植版</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        overflow: hidden;
+        font-family: 'Microsoft YaHei', system-ui, sans-serif;
+      }
+      #app {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #game {
+        display: block;
+        image-rendering: auto;
+        touch-action: none;
+      }
+      #boot {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #d8e8a0;
+        background: radial-gradient(circle at 50% 40%, #1d2a10 0%, #000 70%);
+        z-index: 10;
+        transition: opacity 0.4s ease;
+        font-size: 14px;
+        letter-spacing: 2px;
+      }
+      #boot.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #boot .spinner {
+        width: 46px;
+        height: 46px;
+        margin-bottom: 18px;
+        border: 3px solid rgba(180, 220, 90, 0.15);
+        border-top-color: #b8dc5a;
+        border-radius: 50%;
+        animation: spin 0.9s linear infinite;
+      }
+      #boot .err {
+        color: #ff8a7a;
+        max-width: 70vw;
+        white-space: pre-wrap;
+        text-align: center;
+        font-size: 12px;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"><canvas id="game"></canvas></div>
+    <div id="boot">
+      <div class="spinner"></div>
+      <div id="boot-text">正在加载资源…</div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
+

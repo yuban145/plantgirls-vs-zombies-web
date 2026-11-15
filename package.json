@@ -1,0 +1,20 @@
+{
+  "name": "plangirls-vs-zombies-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Web port of PlantGirlsVsZombies (Lawn engine) - TypeScript + Canvas2D",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5188",
+    "build": "tsc --noEmit && vite build && node tools/copy-data.mjs",
+    "preview": "vite preview --host 127.0.0.1 --port 5189",
+    "package": "node tools/package.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0",
+    "vite": "^7.1.0"
+  },
+  "dependencies": {
+    "@esotericsoftware/spine-webgl": "4.2.43"
+  }
+}

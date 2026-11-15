@@ -1,0 +1,220 @@
+{
+ "params": [
+  {
+   "type": "Peashooter",
+   "spine": "spanim/peashooter",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/PeaShooterSingle",
+   "fps": "16"
+  },
+  {
+   "type": "Sunflower",
+   "spine": "spanim/sunflower",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/SunFlower",
+   "fps": "16"
+  },
+  {
+   "type": "Squash",
+   "spine": "spanim/squash",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/Squash",
+   "fps": "16"
+  },
+  {
+   "type": "Snowpea",
+   "spine": "spanim/snowpea",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/SnowPea",
+   "fps": "16"
+  },
+  {
+   "type": "Repeater",
+   "spine": "spanim/repeater",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/PeaShooter",
+   "fps": "16"
+  },
+  {
+   "type": "Tallnut",
+   "spine": "spanim/tallnut",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/Tallnut",
+   "fps": "15"
+  },
+  {
+   "type": "Fumeshroom",
+   "spine": "spanim/fumeshroom",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/FumeShroom",
+   "fps": "4.8"
+  },
+  {
+   "type": "Puffshroom",
+   "spine": "spanim/puffshroom",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/PuffShroom",
+   "fps": "18.181818"
+  },
+  {
+   "type": "Hypnoshroom",
+   "spine": "spanim/hypnoshroom",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/HypnoShroom",
+   "fps": "16"
+  },
+  {
+   "type": "Chomper",
+   "spine": "spanim/chomper",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/Chomper",
+   "fps": "16"
+  },
+  {
+   "type": "Spikeweed",
+   "spine": "spanim/caltrop",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/Caltrop",
+   "fps": "18.181818"
+  },
+  {
+   "type": "Spikerock",
+   "spine": "spanim/spikerock",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/SpikeRock",
+   "fps": "16"
+  },
+  {
+   "type": "Iceshroom",
+   "spine": "spanim/iceshroom",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/IceShroom",
+   "fps": "16"
+  },
+  {
+   "type": "Scrareyshroom",
+   "spine": "spanim/scaredyshroom",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/ScaredyShroom",
+   "fps": "8.888889"
+  },
+  {
+   "type": "Pumpkin",
+   "spine": "spanim/pumpkin_body",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/Pumpkin",
+   "fps": "16"
+  },
+  {
+   "type": "Plantern",
+   "spine": "spanim/plantern",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/Plantern",
+   "fps": "16"
+  },
+  {
+   "type": "Splitpea",
+   "spine": "spanim/splitpea",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/SplitPea",
+   "fps": "16"
+  },
+  {
+   "type": "Seashroom",
+   "spine": "spanim/seashroom",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/SeaShroom",
+   "fps": "16"
+  },
+  {
+   "type": "Blover",
+   "spine": "spanim/blover",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/Blover",
+   "fps": "16"
+  },
+  {
+   "type": "GraveBuster",
+   "spine": "spanim/gravebuster",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/Gravebuster",
+   "fps": "16"
+  },
+  {
+   "type": "Kernelpult",
+   "spine": "spanim/cornpult",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/Cornpult",
+   "fps": "16"
+  },
+  {
+   "type": "Umbrellaleaf",
+   "spine": "spanim/umbrellaleaf",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/Umbrellaleaf",
+   "fps": "16"
+  },
+  {
+   "type": "Gatlingpea",
+   "spine": "spanim/gatlingpea",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/GatlingPea",
+   "fps": "16"
+  },
+  {
+   "type": "Cattail",
+   "spine": "spanim/cattail",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/Cattail",
+   "fps": "16"
+  },
+  {
+   "type": "Garlic",
+   "spine": "spanim/garlic",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/Garlic",
+   "fps": "16"
+  },
+  {
+   "type": "Imitater",
+   "spine": "spanim/imitater",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/Imitater",
+   "fps": "16"
+  },
+  {
+   "type": "Agave",
+   "spine": "spanim/agave",
+   "flag": "0",
+   "useSpine": true,
+   "fallback": "reanim/Agave",
+   "fps": "16"
+  }
+ ]
+}

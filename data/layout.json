@@ -1,0 +1,681 @@
+{
+  "_comment": "PlantGirlsVsZombies -> TypeScript/Canvas2D render-layout spec. All values resolved from decompiled C# (D:/逆向/output/PlantGirlsVsZombies/decompiled/Lawn) with Constants.Load480x800() active (Sexy/Main.cs:775-776). Coordinate systems: 'boardLocal' = coordinates inside the Board widget (all Board.GridToPixel*/game logic); 'screen' = logical 1000x600 canvas (boardLocal + board.origin = screen). Asset sizes marked 'measured' were extracted from the XNB (see docs/spec-render.md section 13). Units: logical px; times in ticks (100 ticks/s).",
+  "meta": {
+    "source_decompiled_root": "D:/逆向/output/PlantGirlsVsZombies/decompiled/Lawn",
+    "assets_root": "D:/逆向/PlantGirlsVsZombies/Content",
+    "layout_loader": "Constants.Load480x800()",
+    "layout_loader_citation": "Sexy/Constants.cs:524-1036; invoked at Sexy/Main.cs:775-776",
+    "layout_loader_note": "Load600x1000 (Sexy/Constants.cs:1039+) is NOT used by the shipping build.",
+    "spec_document": "docs/spec-render.md",
+    "scope": "Day adventure lawn (BackgroundType.Num1Day). Pool/night/roof/fog/minigames omitted."
+  },
+
+  "logicalCanvas": {
+    "width": 1000,
+    "height": 600,
+    "citation": "Sexy/Main.cs:33-34 PreferredBackBufferWidth=1000/Height=600; Sexy/Constants.cs:548 BackBufferSize=new Point(600,1000) (height,width order)",
+    "windowDefault": { "width": 1600, "height": 900, "citation": "D:/逆向/PlantGirlsVsZombies/config.json screen_size" },
+    "screenScaleAlgorithm": {
+      "citation": "Sexy/ScreenScales.cs:10-32",
+      "if_window_relatively_wider": "scale = screenW/1000; transX = 0; transY = (screenH - 600*scale)/2",
+      "else": "scale = screenH/600; transY = 0; transX = (screenW - 1000*scale)/2",
+      "windowPixel": "logical * scale + (transX, transY)",
+      "window1600x900_resolved": { "scale": 1.5, "transX": 50, "transY": 0 },
+      "inverseMap_citation": "Sexy/ScreenScales.cs:83-92"
+    }
+  },
+
+  "tick": {
+    "ticksPerSecond": 100,
+    "secondsPerTick": 0.01,
+    "fixedTimestep": true,
+    "citation": "Sexy/Main.cs:39 TargetElapsedTime=TimeSpan.FromSeconds(0.01); update path Lawn/LawnApp.cs:1987-2031, Lawn/Board.cs:4605-4732",
+    "speedMultiplier": {
+      "values": [0, 1, 2, 3],
+      "meaning": "0 = paused/stopped; 1/2/3 = simulation updates per rendered frame",
+      "default": 1,
+      "citation": "Lawn/Board.cs:14498,14499; Lawn/Board.cs:3499-3512; Lawn/Board.cs:4691-4729"
+    },
+    "note": "All integer countdowns in game data (seed refresh 750, wave countdowns, etc.) are ticks."
+  },
+
+  "board": {
+    "_comment": "The Board widget is translated by (board.originX, board.originY) by the widget manager. Add origin to every boardLocal value to get screen coordinates.",
+    "originX": 100,
+    "originY": 0,
+    "originX_citation": "Sexy/Constants.cs:533 Board_Offset_AspectRatio_Correction=100; Lawn/Board.cs:705-710 mX=100; Lawn/LawnApp.cs:904-910 Resize(100,0,mWidth,mHeight)",
+    "fullRect_boardLocal": { "x": -100, "y": 0, "width": 1000, "height": 600, "citation": "Lawn/Board.cs:678-681" },
+    "boardWidth": 1000,
+    "boardHeight": 600,
+    "boardWidth_citation": "Sexy/Constants.cs:555,549",
+    "wideBoardWidth": 800,
+    "wideBoardWidth_citation": "Sexy/Constants.cs:577 (logical right edge used by mowers/death checks)",
+    "camera": {
+      "enabled": true,
+      "x": 0,
+      "y": 0,
+      "zoom": 1,
+      "effective": "identity in normal play; ignore for Day gameplay",
+      "citation": "Lawn/Board.cs:898-903,13961,14614-14650"
+    },
+    "s": 1,
+    "is": 1,
+    "sui": 0.8,
+    "isui": 1.25,
+    "scaleHelpers": {
+      "InvertLowResValue(x)": "1.875*x",
+      "InvertAndScale(x)": "1.875*x*S = 1.875*x",
+      "InvertAndScaleUI(x)": "1.875*x*SUI = 1.5*x",
+      "InvertAndScaleGame(x)": "x",
+      "citation": "Sexy/Constants.cs:494-515,528-531",
+      "int_cast": "C# (int) truncates toward zero"
+    }
+  },
+
+  "grid": {
+    "_comment": "Day lawn: 9 columns x 5 playable rows. Cell index (col=0..8, row=0..4).",
+    "columns": 9,
+    "rowArraySize": 6,
+    "playableRows": 5,
+    "row5Type": "dirt",
+    "cellWidth": 80,
+    "cellHeight": 100,
+    "cellHeight6RowStages": 85,
+    "originX_boardLocal": 40,
+    "originY_boardLocal": 80,
+    "originX_screen": 140,
+    "originY_screen": 80,
+    "cellLeft_boardLocal_formula": "40 + 80*col",
+    "cellTop_boardLocal_formula": "80 + 100*row",
+    "cellLeft_screen_formula": "140 + 80*col",
+    "cellTop_screen_formula": "80 + 100*row",
+    "cellSize_day": { "w": 80, "h": 100 },
+    "gridRect_boardLocal": { "x": 40, "y": 80, "width": 720, "height": 500 },
+    "gridRect_screen": { "x": 140, "y": 80, "width": 720, "height": 500 },
+    "pixelToGrid": {
+      "gridX": "x<40 ? -1 : clamp((x-40)/80, 0, 8)",
+      "gridY_day": "clamp((y-80)/100, 0, 4)",
+      "note": "input coordinates are boardLocal in normal play",
+      "citation": "Lawn/Board.cs:5451-5490"
+    },
+    "highGroundHeight": 30,
+    "highGroundNote": "Only high-ground stages (not Day); GridToPixelY subtracts 30 for those cells.",
+    "celHighlightYTable": {
+      "_comment": "Art-aligned row tops used ONLY for the hover cell highlight / ice overlay, not for plant or zombie positions.",
+      "values": [80, 177, 280, 380, 470, 570, 610],
+      "citation": "Sexy/Constants.cs:898 Board_Cel_Y_Values_Normal; Lawn/Board.cs:7905-7979",
+      "lastColumnQuirk": "for col==8 the highlight polygon's right edge is hard-coded 878 instead of 760 (Lawn/Board.cs:7964-7976)"
+    },
+    "rows": [
+      { "row": 0, "cellTop_boardLocal": 80,  "cellTop_screen": 80 },
+      { "row": 1, "cellTop_boardLocal": 180, "cellTop_screen": 180 },
+      { "row": 2, "cellTop_boardLocal": 280, "cellTop_screen": 280 },
+      { "row": 3, "cellTop_boardLocal": 380, "cellTop_screen": 380 },
+      { "row": 4, "cellTop_boardLocal": 480, "cellTop_screen": 480 }
+    ],
+    "columnsX": [
+      { "col": 0, "cellLeft_boardLocal": 40,  "cellLeft_screen": 140 },
+      { "col": 1, "cellLeft_boardLocal": 120, "cellLeft_screen": 220 },
+      { "col": 2, "cellLeft_boardLocal": 200, "cellLeft_screen": 300 },
+      { "col": 3, "cellLeft_boardLocal": 280, "cellLeft_screen": 380 },
+      { "col": 4, "cellLeft_boardLocal": 360, "cellLeft_screen": 460 },
+      { "col": 5, "cellLeft_boardLocal": 440, "cellLeft_screen": 540 },
+      { "col": 6, "cellLeft_boardLocal": 520, "cellLeft_screen": 620 },
+      { "col": 7, "cellLeft_boardLocal": 600, "cellLeft_screen": 700 },
+      { "col": 8, "cellLeft_boardLocal": 680, "cellLeft_screen": 780 }
+    ],
+    "citation": "Sexy/Constants.cs:555-561,579-580,3026-3029; Lawn/Board.cs:5385-5388 (Day has 5 rows),5493-5536,5451-5490,9635-9642"
+  },
+
+  "background": {
+    "_comment": "Day lawn background. Drawn 1:1 (unscaled) at the given position inside the Board frame. The lawn grid maps to background pixel (500+80*col, 140+100*row) - verified by extracting the asset and overlaying the grid.",
+    "dayBackgroundType": "BackgroundType.Num1Day",
+    "daySelection": "adventure/quickplay levels 1-10",
+    "daySelection_citation": "Lawn/Board.cs:9444-9447; Lawn/Board.cs:5385-5388",
+    "asset": "Resources.IMAGE_BACKGROUND1",
+    "assetPath": "Content/images/600x1000/background1_hd.xnb",
+    "nativeSize": { "width": 1880, "height": 720, "_comment": "measured from the XNB texture data; resources.xml invscale=1 => drawn 1:1" },
+    "nativeSizeStatus": "measured_from_asset",
+    "soddedVariant": "Resources.IMAGE_BACKGROUND1",
+    "unsoddedVariant": "Resources.IMAGE_BACKGROUND1UNSODDED",
+    "unsoddedUsedBy": "first-time levels 1-4 intro + ChallengeResodded only",
+    "unsodded_citation": "Lawn/Board.cs:13059-13074",
+    "rawOffsetX": -192,
+    "rawOffsetY": -48,
+    "offsetMultiplier": 1.25,
+    "offsetXAfterMultiplier": -240,
+    "offsetYAfterMultiplier": -60,
+    "boardOffsetConstant": 220,
+    "drawPos_boardLocal": { "x": -460, "y": -60 },
+    "drawPos_screen": { "x": -360, "y": -60 },
+    "drawSize": { "width": 1880, "height": 720 },
+    "scale": 1,
+    "lawnMapping": {
+      "backgroundPixelX_formula": "screenX + 360 = boardLocalX + 460",
+      "backgroundPixelY_formula": "screenY + 60 = boardLocalY + 60",
+      "gridCell0_0_pixel": { "x": 500, "y": 140 },
+      "gridCellPixel_formula": "x = 500 + 80*col ; y = 140 + 100*row",
+      "cellSizeInBackgroundPx": { "w": 80, "h": 100 }
+    },
+    "citation": "Lawn/Board.cs:4911-5046 (case Num1Day at 4918-4922; offsets scaled at 4990-4991; draw at 5024); Sexy/Constants.cs:557,578",
+    "gameOverOverlays": {
+      "exteriorMask_IMAGE_BACKGROUND1_GAMEOVER_MASK_at_screen": { "x": -130, "y": 178 },
+      "interior_IMAGE_BACKGROUND1_GAMEOVER_INTERIOR_OVERLAY_at_screen": { "x": -126, "y": 225 },
+      "citation": "Sexy/Constants.cs:901-910; Lawn/Board.cs:11784-11848"
+    },
+    "introCutsceneExtras": {
+      "IMAGE_BACKGROUND1UNSODDED_drawPos_boardLocal": { "x": -460, "y": -60 },
+      "IMAGE_SOD1ROW_drawPos_boardLocal": { "x": 19, "y": 265 },
+      "IMAGE_SOD1ROW_sourceTrim": "src=(0,0,TodAnimateCurve(0,1000,mSodPosition,0,IMAGE_SOD1ROW.GetWidth()),height)",
+      "IMAGE_SOD3ROW_drawPos_boardLocal": { "x": 15, "y": 149 },
+      "IMAGE_SOD3ROW_unpackLogicalSize": { "width": 771, "height": 355, "status": "atlas mInvScale=0.8 makes displayed size approximate/unresolved" },
+      "citation": "Lawn/Board.cs:4993-5015; AtlasResources_600x1000.cs:13168,13178"
+    }
+  },
+
+  "seedBank": {
+    "_comment": "Vertical seed packet column on the left edge (screen coordinates; SeedBank.Draw compensates the board offset). Packet mX=0 in play, mY (card top) from GetSeedPacketPositionY. Cel (81x106) is drawn with its top at mY-53, so the visible card occupies mY..mY+52.",
+    "widget": {
+      "width": 92,
+      "widthSource": "Constants.New.SeedBank_Width=92",
+      "width_citation": "Sexy/Constants.cs:3029",
+      "mX_during_play": 0,
+      "mY_during_play": 0,
+      "mX_note": "slid in by CutScene.Move(0,0) while still in LevelIntro; SeedBank.Draw subtracts Board_Offset_AspectRatio_Correction only while Playing so packet coords are screen coords",
+      "mX_citation": "Lawn/CutScene.cs:387-390; Lawn/SeedBank.cs:57-71,276-280"
+    },
+    "packet": {
+      "cardWidth": 81,
+      "cardHeight": 52,
+      "celWidth": 81,
+      "celHeight": 106,
+      "celWidth_citation": "Sexy/Constants.cs:571-572; Resources IMAGE_SEEDPACKETS 648x2756 / invscale2 / 4x13 => cel 81x106 (measured)",
+      "celIndexFormula": "cel = (int)seedType ; col = cel % 4 ; row = cel / 4",
+      "celIndex_citation": "Lawn/SeedPacket.cs:343-352; Sexy/Image.cs:71-78",
+      "drawing": {
+        "celTopLeft_screen": "(0, cardTopY - 53)",
+        "cardTopLeft_screen": "(0, cardTopY)",
+        "x": 0
+      },
+      "drawing_citation": "Lawn/SeedPacket.cs:155-214; Lawn/SeedBank.cs:93-141",
+      "costTab": {
+        "image": "AtlasResources.IMAGE_SEEDPACKETS_GREEN_TAB (or GRAY_TAB for Imitater, PURPLE_TAB for seed>=Gatlingpea)",
+        "size": { "width": 33, "height": 20 },
+        "offsetFromPacketOrigin": { "x": 42, "y": 26 },
+        "citation": "Sexy/Constants.cs:667; Lawn/SeedPacket.cs:437-465; AtlasResources_600x1000.cs:13227"
+      },
+      "costText": {
+        "font": "Resources.FONT_PICO129",
+        "justification": "right",
+        "offsetFromPacketOrigin": { "x": 74, "y": 22 },
+        "citation": "Sexy/Constants.cs:669; Lawn/SeedPacket.cs:491-504"
+      },
+      "selectionOverlay": {
+        "image": "AtlasResources.IMAGE_SELECTED_PACKET",
+        "size": { "width": 92, "height": 60 },
+        "offsetFromPacketOrigin": { "x": -5, "y": -2 },
+        "offsetNote": "Sexy/Constants.cs:583 stores SeedPacket_Selector_Pos=(-5,2); the draw call adds X and subtracts Y from mOffsetY, so the effective offset is (-5,-2).",
+        "citation": "Sexy/Constants.cs:583; Lawn/SeedPacket.cs:237-251; AtlasResources_600x1000.cs:2542"
+      }
+    },
+    "positionY": {
+      "_comment": "Board.GetSeedPacketPositionY. n = number of packets in bank (default 6; 8/10 after packet upgrades). h starts at SMALL_SEEDPACKET_HEIGHT=52; additions use (int)InvertAndScale and truncation toward zero. spacing = h + 10. cardTopY = 20 + i*spacing.",
+      "heightConstant": 52,
+      "perN": [
+        { "packets": 6,  "spacing": 77, "cardTops": [20, 97, 174, 251, 328, 405] },
+        { "packets": 7,  "spacing": 77, "cardTops": [20, 97, 174, 251, 328, 405, 482] },
+        { "packets": 8,  "spacing": 71, "cardTops": [20, 91, 162, 233, 304, 375, 446, 517] },
+        { "packets": 9,  "spacing": 62, "cardTops": [20, 82, 144, 206, 268, 330, 392, 454, 516] },
+        { "packets": 10, "spacing": 57, "cardTops": [20, 77, 134, 191, 248, 305, 362, 419, 476, 533] }
+      ],
+      "formulaBreakdown": {
+        "n<=7": "h = 52 + (int)InvertAndScale(8) = 52+15 = 67 ; spacing = 77",
+        "n==8": "h = 52 + (int)InvertAndScale(5) = 52+9 = 61 ; spacing = 71",
+        "n==9": "h = 52 (no adjustment) ; spacing = 62",
+        "n==10": "h = 52 + (int)InvertAndScale(-3) = 52-5 = 47 ; spacing = 57",
+        "baseY": 20
+      },
+      "defaultPacketCount": 6,
+      "defaultPacketCount_formula": "min(mPlayerInfo.mPurchases[21] + 6, 10)",
+      "citation": "Lawn/Board.cs:6875-6896,1679-1686,5351-5357"
+    },
+    "hitTest": {
+      "boardLocalXRange": [-99, -18],
+      "screenXRange": [1, 82],
+      "yRule": "nearest packet with CenterY()=mY+26 within 104 px",
+      "citation": "Lawn/SeedBank.cs:238-273"
+    }
+  },
+
+  "sunCounter": {
+    "image": "AtlasResources.IMAGE_DAN_SUNBANK",
+    "size": { "width": 143, "height": 44 },
+    "screenPos": { "x": 119, "y": 0 },
+    "positionDerivation": "UISunBankPositionX(119) - Board_Offset_AspectRatio_Correction(100) = 19 boardLocal, drawn inside Board frame (+100) => screen x=119; y=seedBank.mX=0 in play",
+    "text": {
+      "font": "Resources.FONT_CONTINUUMBOLD14OUTLINE",
+      "color": { "r": 0, "g": 0, "b": 0, "flashRedWhenOutOfMoney": true },
+      "justification": "center",
+      "screenPos": { "x": 211, "y": 3 },
+      "textOffset": { "x": 92, "y": 3 }
+    },
+    "citation": "Lawn/SeedBank.cs:216-235; Sexy/Constants.cs:888-889; AtlasResources_600x1000.cs:13203"
+  },
+
+  "shovel": {
+    "visibleWhen": "HasShovel() && (gameScene==Playing || shovel tutorial)",
+    "bankImage": "AtlasResources.IMAGE_SHOVELBANK_ZEN",
+    "bankSize": { "width": 70, "height": 72 },
+    "bankScreenPos": { "x": 270, "y": 3 },
+    "iconImage": "AtlasResources.IMAGE_SHOVEL_PLANTGIRL",
+    "iconSize": { "width": 76, "height": 71 },
+    "iconScreenPos": { "x": 263, "y": 0 },
+    "citation": "Sexy/Constants.cs:890; Lawn/Board.cs:7094-7111,7246-7264,12314-12322; AtlasResources_600x1000.cs:17256,13204"
+  },
+
+  "hud": {
+    "_comment": "Resolved final screen coords. The menu/accelerate/pause buttons + sun counter + shovel + progress meter are drawn at render z=100001 (BottomUi, below lawn objects); seed packets + level banner are z=700000 (TopUi).",
+    "progressMeter": {
+      "frameImage": "AtlasResources.IMAGE_FLAGMETER",
+      "frameScreenPos": { "x": 450, "y": 3 },
+      "frameCelSize": { "width": 237, "height": 40 },
+      "frameCelIndex": { "col": 0, "row": 0 },
+      "barEnd": 225,
+      "headEnd": 220,
+      "barFill": {
+        "num2_formula": "TodAnimateCurve(0,150,mProgressMeterWidth,0,225)",
+        "dest_boardLocal": { "x_formula": "350 + 237 - num2 - 7", "y": 3, "w_formula": "num2", "h": 40 },
+        "dest_screenX_formula": "680 - num2",
+        "srcRect": { "x_formula": "237 - num2 - 7", "y": 40, "w_formula": "num2", "h": 40 }
+      },
+      "head": {
+        "image": "AtlasResources.IMAGE_FLAGMETERPARTS",
+        "celSize": { "width": 38, "height": 38 },
+        "cel": { "col": 0, "row": 0 },
+        "num6_formula": "TodAnimateCurve(0,150,mProgressMeterWidth,0,220)",
+        "boardLocalX_formula": "350 + 237 - num6 - 20",
+        "screenX_formula": "667 - num6",
+        "y": 0
+      },
+      "flagIcons": {
+        "image": "AtlasResources.IMAGE_FLAGMETERPARTS",
+        "celSize": { "width": 38, "height": 38 },
+        "cels": [{ "col": 1, "row": 0 }, { "col": 2, "row": 0 }],
+        "x_formula": "TodAnimateCurve(0,mNumWaves,k*numWavesPerFlag, 350+237-10, 350+6) boardLocal",
+        "yOffsets": [-4, -3],
+        "k": "1..mNumWaves/numWavesPerFlag"
+      },
+      "meterText": {
+        "font": "Resources.FONT_DWARVENTODCRAFT12",
+        "color": { "r": 224, "g": 187, "b": 98 },
+        "screenPos": { "x": 568, "y": 1 },
+        "justification": "center"
+      },
+      "visibleWhen": "HasProgressMeter(): mProgressMeterWidth!=0 and not continuous/Zen/Tree/ScaryPotter",
+      "widthRange": [0, 150],
+      "citation": "Lawn/Board.cs:6568-6650,9096-9163,11458-11461; Sexy/Constants.cs:891-893,912; AtlasResources_600x1000.cs:13183,13213"
+    },
+    "menuButton": {
+      "screenRect": { "x": 800, "y": 3, "width": 100, "height": 45 },
+      "style": "stone 3-slice (IMAGE_BUTTON_LEFT / _MIDDLE / _RIGHT, 29x45)",
+      "label": "[MENU_BUTTON]",
+      "citation": "Sexy/Constants.cs:886-887; Lawn/Board.cs:855-856; AtlasResources_600x1000.cs:2519; Lawn/GameButton.cs:361-388"
+    },
+    "accelerateButton": {
+      "screenRect": { "x": 755, "y": 3, "width": 45, "height": 45 },
+      "iconOffsets": { "pauseIcon": { "x": 12, "y": 5 }, "speed01": { "x": 4, "y": 0 }, "speed02": { "x": 4, "y": 0 }, "speed03": { "x": 4, "y": 0 } },
+      "citation": "Lawn/Board.cs:857-866,10178-10232; AtlasResources_600x1000.cs:13189,13198"
+    },
+    "pauseButton": {
+      "screenRect": { "x": 710, "y": 3, "width": 45, "height": 45 },
+      "iconOffset": { "x": 12, "y": 5 },
+      "visibleWhen": "HasPauseButton(): default true except whack-a-zombie",
+      "citation": "Lawn/Board.cs:867-879,10234-10241,7180-7199; AtlasResources_600x1000.cs:13198"
+    },
+    "levelBanner": {
+      "font": "Resources.FONT_HOUSEOFTERROR16",
+      "color": { "r": 224, "g": 187, "b": 98, "alphaFormula": "clamp(255*mLevelFadeCount/15,0,255)" },
+      "anchorScreen": { "x": 891, "y": 565 },
+      "justification": "right",
+      "visibleTicks": 1000,
+      "visibleTicks_citation": "mLevelFadeCount set to 1000 at StartLevel, decremented 1/tick",
+      "citation": "Sexy/Constants.cs:885; Lawn/Board.cs:7024-7091,1937-1938,4682-4685"
+    },
+    "coinBank": {
+      "image": "AtlasResources.IMAGE_COINBANK",
+      "size": { "width": 192, "height": 47 },
+      "screenPos": { "x": 138, "y": 551 },
+      "text": {
+        "font": "Resources.FONT_CONTINUUMBOLD14",
+        "color": { "r": 180, "g": 255, "b": 90 },
+        "offsetFromImage": { "x": 180, "y": 8 },
+        "justification": "right-aligned: x = image.x + 180 - textWidth"
+      },
+      "citation": "Sexy/Constants.cs:894,712; Lawn/Board.cs:7599-7634; AtlasResources_600x1000.cs:72"
+    }
+  },
+
+  "lawnMower": {
+    "_comment": "One lawn mower per playable row. Created invisible by InitLawnMowers during the intro, rolled in by CutScene to rest at posX=-21, then waits.",
+    "rows": [0, 1, 2, 3, 4],
+    "restPos_boardLocal": { "x": -21, "y_formula": "103 + 100*row" },
+    "restPos_boardLocal_perRow": [
+      { "row": 0, "x": -21, "y": 103 },
+      { "row": 1, "x": -21, "y": 203 },
+      { "row": 2, "x": -21, "y": 303 },
+      { "row": 3, "x": -21, "y": 403 },
+      { "row": 4, "x": -21, "y": 503 }
+    ],
+    "restPos_screen_perRow": [
+      { "row": 0, "x": 79, "y": 103 },
+      { "row": 1, "x": 79, "y": 203 },
+      { "row": 2, "x": 79, "y": 303 },
+      { "row": 3, "x": 79, "y": 403 },
+      { "row": 4, "x": 79, "y": 503 }
+    ],
+    "initPosX_boardLocal": -160,
+    "rollInTargetX_boardLocal": -21,
+    "rollInCurve": "TodAnimateCurveFloat(0,100,rollingInCounter,-160,-21,EaseInOut) + BOARD_EXTRA_ROOM (CutScene uses -80..-21)",
+    "attackRect": { "x": "posX", "y": "posY", "width": 50, "height": 80 },
+    "triggerCondition": "same row && GetRectOverlap(mowerRect, zombieRect) > 0",
+    "triggerX_boardLocal": 29,
+    "triggerX_screen": 129,
+    "rollSpeedPxPerTick": 3.33,
+    "rollSpeedPoolPxPerTick": 2.5,
+    "dieWhenX_gt_boardLocal": 800,
+    "renderOrder": "306000 + 10000*row, then -5000 when added to the draw list => 301000 + 10000*row",
+    "drawing": {
+      "ready": {
+        "image": "ReanimatorCache cached mower (90x100 canvas)",
+        "graphicsTranslate": { "x_formula": "posX + 6", "y_formula": "posY - altitude - 14" },
+        "cachedDrawCall": "DrawCachedMower(g, 0, 19) => image draws at (-20, 19) inside that translate",
+        "resultingSpriteTopLeft_boardLocal": { "x_formula": "posX - 14", "y_formula": "posY + 5" },
+        "resultingSpriteTopLeft_screen_rest": { "x": 65, "y_formula": "108 + 100*row" }
+      },
+      "shadow": {
+        "image": "AtlasResources.IMAGE_PLANTSHADOW",
+        "celSize": { "width": 86, "height": 36 },
+        "center_boardLocal_formula": "x = posX - 7 + 2 ; y = posY - altitude + 47 - 2"
+      },
+      "triggered": "same translate, draws Lawnmower reanim (added at (0,18), scale 0.85, anim_normal)",
+      "mowerType": "LawnMowerType.Lawn (ReanimationType.Lawnmower)"
+    },
+    "citation": "Lawn/LawnMower.cs:94-146,172-261,264-377; Lawn/Board.cs:12650-12662,1092-1101; Lawn/CutScene.cs:682-699,1570-1589; Lawn/ReanimatorCache.cs:143-156,499-543; AtlasResources_600x1000.cs:9320"
+  },
+
+  "sun": {
+    "_comment": "Falling sun currency (CoinType.Sun, CoinMotion.FromSky). Board-local coordinates (drawn in the Board frame; render order 600001 => above all lawn objects).",
+    "logicSize": { "width": 43, "height": 43 },
+    "logicSize_citation": "Lawn/Coin.cs:82-83 mWidth=mHeight=(int)InvertAndScale(23)=43",
+    "sprite": {
+      "type": "ReanimationType.Sun (reanim)",
+      "center_boardLocal_formula": "x = posX + 21.5 ; y = posY + 21.5",
+      "note": "the 43x43 box is the logic/click box; visible art is the sun reanim centered on that offset",
+      "citation": "Lawn/Coin.cs:107-116,518-536"
+    },
+    "spawn": {
+      "x_boardLocal": { "min": 40, "max": 589, "formula": "LAWN_XMIN(40) + rand[0,550)" },
+      "y_boardLocal": 60,
+      "x_screen": { "min": 140, "max": 689 },
+      "citation": "Lawn/Board.cs:7481-7482,7517; Sexy/Constants.cs:896 Board_SunCoinRange=550"
+    },
+    "fall": {
+      "velY_pxPerTick": 0.67,
+      "velX_pxPerTick": 0,
+      "groundY_boardLocal": { "min": 300, "max": 549, "formula": "rand[0,250) + 300" },
+      "landing": "rests at posY=groundY, x snapped to int",
+      "disappearAfterLandingTicks": 750,
+      "fadeTicks": 15,
+      "citation": "Lawn/Coin.cs:317-323,1178-1327,1639-1655"
+    },
+    "countdown": {
+      "firstSunTicks": { "min": 425, "max": 700, "formula": "rand(425..700)" },
+      "nextSunTicks": "min(950, 425 + 10*numSunsFallen) + rand[0,275)",
+      "citation": "Lawn/Board.cs:1669-1671,7476-7490"
+    },
+    "clickBox": {
+      "margin": 50,
+      "x_boardLocalRule": "posX-50 <= x < posX + 43 + 50",
+      "y_boardLocalRule": "posY-50 <= y < posY + 43 + 50",
+      "citation": "Lawn/Coin.cs:448-482"
+    },
+    "collect": {
+      "target_boardLocal": { "x": 15, "y": 5 },
+      "target_screen": { "x": 115, "y": 5 },
+      "moveFractionPerTick": "1/21 of remaining distance",
+      "creditedWhenDistanceLt": 8,
+      "scaleWhileCollecting": "clamp(distance*0.05, 0.5, 1)",
+      "citation": "Sexy/Constants.cs:897 Board_SunCoin_CollectTarget=(115-100,5); Lawn/Coin.cs:1439-1553"
+    },
+    "value": 25,
+    "valueByType": { "Sun": 25, "Smallsun": 15, "Largesun": 50, "Tinysun": 5 },
+    "renderOrder": 600001,
+    "renderOrder_citation": "Lawn/Coin.cs:94 MakeRenderOrder(CoinBank=600000,0,1)"
+  },
+
+  "zombie": {
+    "_comment": "Normal (Regular) zombie on the Day lawn. Board-local coordinates; add board.originX=100 for screen.",
+    "spawn": {
+      "x_boardLocal": { "min": 780, "max": 819, "formula": "780 + rand[0,40) + Zombie_StartOffset(0)" },
+      "flagWaveExtraX": 40,
+      "x_screen": { "min": 880, "max": 919 },
+      "rowY_boardLocal_formula": "80 + 100*row",
+      "rowY_screen_formula": "80 + 100*row",
+      "mWidth": 120,
+      "mHeight": 120,
+      "citation": "Lawn/Zombie.cs:299-308,379-382,1100-1101; Sexy/Constants.cs:815-816"
+    },
+    "typeOverrides": {
+      "Flag": { "posX_boardLocal": 800 },
+      "Polevaulter": { "posX_boardLocal": "870 + rand[0,10)" },
+      "Zamboni": { "posX_boardLocal": "800 + rand[0,10)" },
+      "Bobsled": { "posX_boardLocal": 880 },
+      "citation": "Lawn/Zombie.cs:407,423,508,546"
+    },
+    "collision": {
+      "hitRect": { "xOffset": 36, "yOffset": 0, "width": 42, "height": 115 },
+      "attackRect": { "xOffset": 50, "yOffset": 0, "width": 20, "height": 115 },
+      "absoluteFormula": "rect = (mX + xOffset, mY + bodyY + yOffset, width, height); Normal on Day: mX=(int)mPosX, mY=(int)mPosY, bodyY=0",
+      "eatCondition": "GetRectOverlap(attackRect, plantRect) >= 20",
+      "eatAttackRect_citation": "Lawn/Zombie.cs:345-346,3799-3841,2814-2830",
+      "attackRangeLeftEdge_boardLocal_relative": 50,
+      "attackRangeRightEdge_boardLocal_relative": 70
+    },
+    "drawing": {
+      "bodyReanimRoot_boardLocal": { "x_formula": "mPosX + 15", "y_formula": "mPosY + bodyY - 8 (Normal, scale=1, day)" },
+      "bodyReanimRoot_exact_formula": "x = mPosX + 15 + (mPosX-(int)mPosX) ; y = mPosY + bodyY - 8 + (mPosY-(int)mPosY)",
+      "bodyY_normal_day": 0,
+      "shadow": {
+        "image": "AtlasResources.IMAGE_PLANTSHADOW",
+        "celSize": { "width": 86, "height": 36 },
+        "center_boardLocal_formula": "x = mPosX + 23 ; y = mPosY + bodyY + 92",
+        "renderOrder": "200000 + 10000*row + 3"
+      },
+      "renderOrder": "303000 + 10000*row + 4",
+      "walkDirection": "left (-x); mirrored (negative M11) when walking backwards",
+      "clipNote": "body reanim clips to the draw position data (GetDrawPos); not needed for straight walking",
+      "citation": "Lawn/Zombie.cs:3060-3126,6697-6784,5988-6223,2125-2129; Lawn/Board.cs:1053-1062"
+    },
+    "speed": {
+      "normalPxPerTick": { "min": 0.23, "max": 0.37, "formula": "RandRangeFloat(0.23,0.37)" },
+      "chilledMultiplier": 0.4,
+      "specials": {
+        "Flag/Dancer/Pogo": 0.45,
+        "Football/Polevaulter/Snorkel/JackInTheBox": "0.66..0.68",
+        "Ladder": "0.79..0.81",
+        "NewspaperMad/Dolphin": "0.89..0.91"
+      },
+      "movementRule": "mPosX -= mVelX every tick (reanim branch), no frame gating",
+      "citation": "Lawn/Zombie.cs:2473-2530,3844-3949; Lawn/GameConstants.cs:1157"
+    },
+    "combat": {
+      "ticksBetweenEats": 4,
+      "chilledTicksBetweenEats": 8,
+      "damagePerEat": 4,
+      "defaultBodyHealth": 270,
+      "citation": "Lawn/GameConstants.cs:1178; Lawn/Zombie.cs:1236-1244,1342-1343,384"
+    }
+  },
+
+  "plant": {
+    "_comment": "Board-local coordinates.",
+    "anchor": "cell top-left",
+    "anchor_formula": { "x": "40 + 80*col", "y": "80 + 100*row" },
+    "size": { "width": 80, "height": 80 },
+    "size_citation": "Lawn/Plant.cs:262-263",
+    "bodyReanimRoot": {
+      "boardLocal_formula": "x = mX + shakeOffsetX ; y = mY + PlantDrawHeightOffset(...) + shakeOffsetY",
+      "note": "shake offsets are 0 for idle plants; height offset is 0 for Peashooter/Sunflower/Wallnut etc.",
+      "citation": "Lawn/Plant.cs:292-293,8014-8162"
+    },
+    "heightOffsets": {
+      "default": 0,
+      "Flowerpot": 26,
+      "Lilypad": 25,
+      "Starfruit": 10,
+      "Tanglekelp": 24,
+      "Seashroom": 28,
+      "InstantCoffee": -20,
+      "FlyingPlants": -30,
+      "Puffshroom": 5,
+      "Gravebuster": 8,
+      "Spikeweed/Spikerock": 15,
+      "Endoflame": 15,
+      "citation": "Lawn/Plant.cs:8583-8713"
+    },
+    "hitRect": {
+      "default": { "xOffset": 10, "yOffset": 0, "width": 60, "height": 80 },
+      "Tallnut": { "xOffset": 10, "yOffset": 0, "width": 80, "height": 80 },
+      "Pumpkinshell": { "xOffset": 0, "yOffset": 0, "width": 60, "height": 80 },
+      "Cobcannon": { "xOffset": 0, "yOffset": 0, "width": 140, "height": 80 },
+      "citation": "Lawn/Plant.cs:3486-3506"
+    },
+    "shadow": {
+      "image": "AtlasResources.IMAGE_PLANTSHADOW",
+      "celSize": { "width": 86, "height": 36 },
+      "center_boardLocal_formula": "x = mX - 3 ; y = mY + heightOffset + 51",
+      "scale": 1,
+      "citation": "Lawn/Plant.cs:5584-5773"
+    },
+    "renderOrder": {
+      "formula": "302000 + 10000*row + (plantOrder*5 - mX + extra)",
+      "plantOrder": { "Lilypad": 0, "Normal": 1, "Pumpkin": 2, "Flyer": 3 },
+      "extra": { "default": 0, "Cobcannon": 0, "Gravebuster": 550, "Pumpkin": 200 },
+      "consequence": "within a row, lower mX (left) draws on top of higher mX (right)",
+      "citation": "Lawn/Plant.cs:5085-5128; Lawn/PlantOrder.cs; Lawn/RenderLayer.cs"
+    },
+    "defaultHealth": 300,
+    "healthNote": "PlantInitialize sets 300; per-type health comes from Plant.GetBaseHealth (e.g. Wallnut 8000). Full per-plant values live in data/plants.json.",
+    "defaultHealth_citation": "Lawn/Plant.cs:239,2762+"
+  },
+
+  "projectile": {
+    "renderOrder_formula": "305000 + 10000*row",
+    "shadowRenderOrder_formula": "305000 + 10000*row + 3",
+    "citation": "Lawn/Projectile.cs:395-402; Lawn/Board.cs:1078-1090"
+  },
+
+  "renderOrder": {
+    "_comment": "Board.DrawGameObjects builds a render list sorted by z then insertion id. MakeRenderOrder(layer,row,offset) = layer + offset + 10000*row (Lawn/Board.cs:10020-10023).",
+    "backdrop": 100000,
+    "bottomUi": 100001,
+    "bottomUi_note": "sun counter + shovel + progress meter + top-right buttons; drawn below lawn objects",
+    "ground": "200000 + 10000*row",
+    "zombieShadow": "200000 + 10000*row + 3",
+    "graveStone": "301000 + 10000*row",
+    "lawnMower_effective": "301000 + 10000*row (mower order 306000 then -5000)",
+    "plant": "302000 + 10000*row",
+    "zombie": "303000 + 10000*row + 4",
+    "boss": "304000 + 10000*row",
+    "projectile": "305000 + 10000*row",
+    "lawnMower_raw": "306000 + 10000*row",
+    "particle": "307000 + 10000*row",
+    "coverLayer": "308000 + 10000*row",
+    "fog": 500000,
+    "coinBank": 600000,
+    "coins_suns": 600001,
+    "topUi": 700000,
+    "topUi_note": "seed packets, level banner, Crazy Dave, advice text",
+    "aboveUi": 800000,
+    "screenFade": 900000,
+    "layerEnum": {
+      "UiBottom": 100000, "Ground": 200000, "Lawn": 300000, "Top": 400000, "Fog": 500000,
+      "CoinBank": 600000, "UiTop": 700000, "AboveUI": 800000, "ScreenFade": 900000,
+      "RowOffset": 10000, "GraveStone": 301000, "Plant": 302000, "Zombie": 303000, "Boss": 304000,
+      "Projectile": 305000, "LawnMower": 306000, "Particle": 307000, "CoverLayer": 308000
+    },
+    "specialFirstPass": "Backdrop, Ice and Gravestone grid items are drawn in a separate first pass (right after backdrop) regardless of z; on the Day lawn there are no gravestones/ice so pass 2 covers everything.",
+    "citation": "Lawn/Board.cs:995-1425,1175-1199; Lawn/RenderLayer.cs; Lawn/RenderItem.cs:79-109"
+  },
+
+  "waveTiming": {
+    "initialCountdownTicks": 1800,
+    "initialCountdown_level2_firstTime": 5000,
+    "countdownAfterWave": {
+      "flagWave": 4500,
+      "normal": "2500 + rand[0,600)"
+    },
+    "rushShortcut": {
+      "condition": "countdown>5 && elapsed>400 && waveHealth <= nextWaveHealthThreshold && countdown>200",
+      "newCountdown": 200
+    },
+    "nextWaveHealthThreshold": "rand(0.5..0.65) * waveStartHealth",
+    "flagWaveCountdown": {
+      "triggerAt": 5,
+      "hugeWaveBannerTicks": 750,
+      "thenCountdown": 1
+    },
+    "numWavesByAdventureLevel1to10": [4, 6, 8, 10, 8, 10, 20, 10, 20, 20],
+    "numWavesPerFlag": "first-time adventure && numWaves<10 ? numWaves : 10",
+    "flagWaveRule": "wave % wavesPerFlag == wavesPerFlag-1; never on first-time level 1",
+    "level1TutorialCountdown": 99,
+    "citation": "Lawn/Board.cs:7297-7439,9864-9940,11773-11781,12977-12988; Lawn/GameConstants.cs:787-794"
+  },
+
+  "startState": {
+    "startingSun_default": 50,
+    "startingSun_level1_firstTime": 150,
+    "citation": "Lawn/Board.cs:1632-1651"
+  },
+
+  "assets": {
+    "_comment": "Asset names referenced; sizes are logical draw sizes (atlas UNPACK sizes or resource size/invscale). 'measured' sizes were read from the shipped XNB textures.",
+    "IMAGE_BACKGROUND1": { "size": { "width": 1880, "height": 720 }, "status": "measured" },
+    "IMAGE_BACKGROUND1UNSODDED": { "size": { "width": 1880, "height": 720 }, "status": "measured" },
+    "IMAGE_BACKGROUND1_GAMEOVER_MASK": { "size": null, "status": "unresolved" },
+    "IMAGE_BACKGROUND1_GAMEOVER_INTERIOR_OVERLAY": { "size": null, "status": "unresolved" },
+    "IMAGE_SEEDPACKETS": {
+      "textureSize": { "width": 648, "height": 2756 },
+      "logicalSize": { "width": 324, "height": 1378 },
+      "rows": 13,
+      "cols": 4,
+      "invscale": 2,
+      "celSize": { "width": 81, "height": 106 },
+      "status": "measured, matches Sexy/Constants.cs:571-572"
+    },
+    "IMAGE_DAN_SUNBANK": { "size": { "width": 143, "height": 44 }, "status": "atlas" },
+    "IMAGE_SHOVELBANK_ZEN": { "size": { "width": 70, "height": 72 }, "status": "atlas" },
+    "IMAGE_SHOVEL_PLANTGIRL": { "size": { "width": 76, "height": 71 }, "status": "atlas" },
+    "IMAGE_FLAGMETER": { "size": { "width": 237, "height": 80 }, "rows": 2, "cols": 1, "celSize": { "width": 237, "height": 40 }, "status": "atlas" },
+    "IMAGE_FLAGMETERPARTS": { "size": { "width": 114, "height": 38 }, "rows": 1, "cols": 3, "celSize": { "width": 38, "height": 38 }, "status": "atlas" },
+    "IMAGE_COINBANK": { "size": { "width": 192, "height": 47 }, "status": "atlas" },
+    "IMAGE_BUTTON_LEFT": { "size": { "width": 29, "height": 45 }, "status": "atlas" },
+    "IMAGE_SELECTED_PACKET": { "size": { "width": 92, "height": 60 }, "status": "atlas" },
+    "IMAGE_SEEDPACKETS_GREEN_TAB": { "size": { "width": 33, "height": 20 }, "status": "atlas" },
+    "IMAGE_PLANTSHADOW": { "size": { "width": 86, "height": 36 }, "status": "atlas" },
+    "IMAGE_ACCELERATION_PAUSE": { "size": { "width": 22, "height": 31 }, "status": "atlas" },
+    "IMAGE_ACCELERATION_01": { "size": { "width": 38, "height": 38 }, "status": "atlas" },
+    "IMAGE_SOD1ROW": { "unpackSize": { "width": 771, "height": 127 }, "invscale": 0.8, "status": "unresolved_exact_display_size" },
+    "IMAGE_SOD3ROW": { "unpackSize": { "width": 771, "height": 355 }, "invscale": 0.8, "status": "unresolved_exact_display_size" },
+    "source": "Lawn/ReanimatorCache.cs, AtlasResources_600x1000.cs (UNPACK_INFO entries), Content/resources.xml, extracted XNB textures"
+  },
+
+  "unresolved": [
+    "Background native size is not in code (code draws 1:1): measured 1880x720 from background1_hd.xnb; re-extraction must reproduce that size.",
+    "Atlas sprites with mInvScale=0.8 (SOD1ROW/SOD3ROW and selector art): displayed logical size follows UNPACK_INFO w/h in AtlasResources but the invscale sampling convention could not be fully confirmed from the decompiled engine; intro-cutscene only.",
+    "Plant/zombie/sun sprites are TOD reanims; this JSON gives the reanim root/hotspot transforms, not per-frame artwork. Converting reanims to sprite sheets must preserve those hotspots.",
+    "Seed packet card sub-rect: cel is 81x106; card top is the cel vertical middle (y=53). Exact opaque bbox differs per portrait (measured first opaque row 41.5-55 px logical on sample cels).",
+    "IMAGE_BACKGROUND1_GAMEOVER_* overlay sizes not measured (game-over only).",
+    "TreeOfWisdom/zen backgrounds and high-ground/6-row cell height 85 are out of scope for the Day spec."
+  ]
+}

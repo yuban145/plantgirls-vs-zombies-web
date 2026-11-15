@@ -1,0 +1,28 @@
+import { cpSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { join, resolve, sep } from 'node:path';
+import { createHash } from 'node:crypto';
+
+const root=fileURLToPath(new URL('../',import.meta.url));
+const version=JSON.parse(readFileSync(join(root,'package.json'),'utf8')).version;
+const name=`plantgirls-vs-zombies-web-v${version}`;
+const artifacts=join(root,'artifacts');
+const destination=join(artifacts,name);
+if(process.platform!=='win32') throw new Error('ZIP packaging currently requires Windows PowerShell. npm run build works on other platforms.');
+execFileSync('cmd.exe',['/d','/c','npm run build'],{cwd:root,stdio:'inherit'});
+if (!resolve(destination).startsWith(resolve(artifacts) + sep)) throw new Error('Package path must stay inside artifacts.');
+rmSync(destination,{recursive:true,force:true});
+mkdirSync(destination,{recursive:true});
+cpSync(join(root,'dist'),destination,{recursive:true});
+cpSync(join(root,'tools','serve.cjs'),join(destination,'serve.cjs'));
+writeFileSync(join(destination,'启动游戏.bat'),'@echo off\r\nchcp 65001 >nul\r\ncd /d "%~dp0"\r\nwhere node >nul 2>nul\r\nif errorlevel 1 (\r\n  echo 请先安装 Node.js，然后重新打开本文件。\r\n  pause\r\n  exit /b 1\r\n)\r\nnode serve.cjs\r\npause\r\n','utf8');
+writeFileSync(join(destination,'使用说明.txt'),'植物娘大战僵尸 · 网页移植版\r\n原作者：庄不纯\r\n\r\n解压全部文件，双击“启动游戏.bat”（需要 Node.js），打开 http://127.0.0.1:5189/ 。\r\n也可在此目录运行 node serve.cjs，或使用任意静态 HTTP 服务器。请通过 HTTP 打开游戏。\r\n\r\n当前为非官方移植版，覆盖白天冒险 1-1～1-10，仍有部分界面、教学、特效差异。\r\n署名与第三方许可见 CREDITS.txt 和 licenses 目录。\r\n','utf8');
+const archive=join(artifacts,`${name}.zip`);
+const quote=s=>"'"+s.replaceAll("'","''")+"'";
+const script=`$ErrorActionPreference='Stop'; $ProgressPreference='SilentlyContinue'; Compress-Archive -LiteralPath ${quote(destination)} -DestinationPath ${quote(archive)} -Force`;
+const powershell=join(process.env.SystemRoot || 'C:\\Windows','System32','WindowsPowerShell','v1.0','powershell.exe');
+execFileSync(powershell,['-NoProfile','-NonInteractive','-EncodedCommand',Buffer.from(script,'utf16le').toString('base64')],{stdio:'inherit'});
+const hash=createHash('sha256').update(readFileSync(archive)).digest('hex');
+writeFileSync(join(artifacts,'SHA256SUMS.txt'),`${hash}  ${name}.zip\n`);
+console.log(`Packaged: ${archive}\nSHA256: ${hash}`);

@@ -1,0 +1,649 @@
+{
+ "_schema": {
+  "tickMilliseconds": 10,
+  "ticksPerSecond": 100,
+  "description": "plants needed by Adventure Day levels 1-10 (fixed banks, chooser offers and conveyor pools) plus Explode-O-Nut used by the Wall-nut Bowling conveyor (1-5).",
+  "units": "all *_Ticks values are game updates (1 tick = 10 ms, 100 ticks/s)",
+  "fields": {
+   "sunCost": "PlantDefinition.mSeedCost (sun)",
+   "refreshTicks": "PlantDefinition.mRefreshTime (seed packet recharge)",
+   "launchRateTicks": "PlantDefinition.mLaunchRate (shoot / sun production interval)",
+   "health": "Plant.GetBaseHealth(seedType)",
+   "attack.projectileDamage": "GameConstants.gProjectileDefinition",
+   "special": "class-code behaviour (fuse, arm, bite, explosion)"
+  }
+ },
+ "_meta": {
+  "game": "PlantGirlsVsZombies (PGvZ 1.3.2)",
+  "generatedBy": "plangirls-web/tools/extract_levels.py",
+  "sourceRoot": "D:\\逆向\\output\\PlantGirlsVsZombies\\decompiled\\Lawn",
+  "tickRate": {
+   "ticksPerSecond": 100,
+   "tickMilliseconds": 10,
+   "_source": {
+    "file": "Sexy/Main.cs",
+    "line": 39
+   }
+  },
+  "sourceTables": {
+   "plantDefinitions": {
+    "file": "Lawn/GameConstants.cs",
+    "line": 1045
+   },
+   "reanimations": {
+    "file": "Lawn/GameConstants.cs",
+    "line": 149
+   },
+   "projectileDefinitions": {
+    "file": "Lawn/GameConstants.cs",
+    "line": 1395
+   },
+   "baseHealth": {
+    "file": "Lawn/Plant.cs",
+    "line": 2762
+   },
+   "straightProjectileSpeed": {
+    "file": "Lawn/Projectile.cs",
+    "line": 1399
+   },
+   "chill": {
+    "file": "Lawn/Zombie.cs",
+    "line": 2259
+   },
+   "explosionDamage": {
+    "file": "Lawn/Board.cs",
+    "line": 11720
+   }
+  }
+ },
+ "plants": [
+  {
+   "seedType": "Peashooter",
+   "displayNameKey": "PEASHOOTER",
+   "localizedNames": {
+    "en": "Peashooter",
+    "zh_cn": "豌豆射手"
+   },
+   "sunCost": 100,
+   "refreshTicks": 750,
+   "refreshSeconds": 7.5,
+   "packetIndex": 0,
+   "subClass": "Shooter",
+   "health": 300,
+   "healthSource": {
+    "file": "Lawn/Plant.cs",
+    "line": 2762
+   },
+   "launchRateTicks": 150,
+   "launchRateSeconds": 1.5,
+   "attack": {
+    "projectileType": "Pea",
+    "projectileDamage": 20,
+    "projectileSpeedPxPerTick": 3.33,
+    "projectileSpeedPxPerSecond": 333.0,
+    "shotsPerAttackCycle": 1,
+    "fireAnimationTicks": 29,
+    "firstShotCountDownTicksRange": [
+     0,
+     150
+    ],
+    "nextShotCountDownTicksRange": [
+     136,
+     150
+    ],
+    "_source": [
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 2453
+     },
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 5333
+     },
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 2557
+     }
+    ]
+   },
+   "production": null,
+   "special": null,
+   "reanimation": {
+    "type": "Peashooter",
+    "resourcePath": "spanim/peashooter",
+    "isSpine": true,
+    "legacyResourcePath": "reanim/PeaShooterSingle",
+    "spineScale": 16.0,
+    "_source": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 155
+    }
+   },
+   "_source": {
+    "definition": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 1047
+    },
+    "class": {
+     "file": "Lawn/Plant.cs",
+     "line": 12
+    }
+   }
+  },
+  {
+   "seedType": "Sunflower",
+   "displayNameKey": "SUNFLOWER",
+   "localizedNames": {
+    "en": "Sunflower",
+    "zh_cn": "向日葵"
+   },
+   "sunCost": 50,
+   "refreshTicks": 750,
+   "refreshSeconds": 7.5,
+   "packetIndex": 1,
+   "subClass": "Normal",
+   "health": 300,
+   "healthSource": {
+    "file": "Lawn/Plant.cs",
+    "line": 2762
+   },
+   "launchRateTicks": 2500,
+   "launchRateSeconds": 25.0,
+   "attack": null,
+   "production": {
+    "sunType": "Sun",
+    "sunValue": 25,
+    "firstSunCountDownTicksRange": [
+     300,
+     1250
+    ],
+    "subsequentSunCountDownTicksRange": [
+     2350,
+     2500
+    ],
+    "_source": [
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 2346
+     },
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 4159
+     }
+    ]
+   },
+   "special": null,
+   "reanimation": {
+    "type": "Sunflower",
+    "resourcePath": "spanim/sunflower",
+    "isSpine": true,
+    "legacyResourcePath": "reanim/SunFlower",
+    "spineScale": 16.0,
+    "_source": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 158
+    }
+   },
+   "_source": {
+    "definition": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 1048
+    },
+    "class": {
+     "file": "Lawn/Plant.cs",
+     "line": 12
+    }
+   }
+  },
+  {
+   "seedType": "Wallnut",
+   "displayNameKey": "WALL_NUT",
+   "localizedNames": {
+    "en": "Wall-nut",
+    "zh_cn": "坚果"
+   },
+   "sunCost": 50,
+   "refreshTicks": 3000,
+   "refreshSeconds": 30.0,
+   "packetIndex": 2,
+   "subClass": "Normal",
+   "health": 4000,
+   "healthSource": {
+    "file": "Lawn/Plant.cs",
+    "line": 2762
+   },
+   "launchRateTicks": 0,
+   "launchRateSeconds": 0.0,
+   "attack": null,
+   "production": null,
+   "special": {
+    "kind": "wall",
+    "_source": {
+     "file": "Lawn/Plant.cs",
+     "line": 2762
+    }
+   },
+   "reanimation": {
+    "type": "Wallnut",
+    "resourcePath": "reanim/Wallnut",
+    "isSpine": false,
+    "legacyResourcePath": null,
+    "spineScale": null,
+    "_source": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 156
+    }
+   },
+   "_source": {
+    "definition": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 1050
+    },
+    "class": {
+     "file": "Lawn/Plant.cs",
+     "line": 12
+    }
+   }
+  },
+  {
+   "seedType": "Cherrybomb",
+   "displayNameKey": "CHERRY_BOMB",
+   "localizedNames": {
+    "en": "Cherry Bomb",
+    "zh_cn": "樱桃炸弹"
+   },
+   "sunCost": 150,
+   "refreshTicks": 5000,
+   "refreshSeconds": 50.0,
+   "packetIndex": 3,
+   "subClass": "Normal",
+   "health": 300,
+   "healthSource": {
+    "file": "Lawn/Plant.cs",
+    "line": 2762
+   },
+   "launchRateTicks": 0,
+   "launchRateSeconds": 0.0,
+   "attack": null,
+   "production": null,
+   "special": {
+    "kind": "instantExplosion",
+    "fuseTicks": 100,
+    "fuseSeconds": 1.0,
+    "damage": 1800,
+    "burn": true,
+    "radius": 115,
+    "rowRange": 1,
+    "selfDestructs": true,
+    "_source": [
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 1504
+     },
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 204
+     }
+    ]
+   },
+   "reanimation": {
+    "type": "Cherrybomb",
+    "resourcePath": "reanim/CherryBomb",
+    "isSpine": false,
+    "legacyResourcePath": null,
+    "spineScale": null,
+    "_source": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 161
+    }
+   },
+   "_source": {
+    "definition": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 1049
+    },
+    "class": {
+     "file": "Lawn/Plant.cs",
+     "line": 12
+    }
+   }
+  },
+  {
+   "seedType": "Snowpea",
+   "displayNameKey": "SNOW_PEA",
+   "localizedNames": {
+    "en": "Snow Pea",
+    "zh_cn": "寒冰射手"
+   },
+   "sunCost": 175,
+   "refreshTicks": 750,
+   "refreshSeconds": 7.5,
+   "packetIndex": 4,
+   "subClass": "Shooter",
+   "health": 300,
+   "healthSource": {
+    "file": "Lawn/Plant.cs",
+    "line": 2762
+   },
+   "launchRateTicks": 150,
+   "launchRateSeconds": 1.5,
+   "attack": {
+    "projectileType": "Snowpea",
+    "projectileDamage": 20,
+    "projectileSpeedPxPerTick": 3.33,
+    "projectileSpeedPxPerSecond": 333.0,
+    "shotsPerAttackCycle": 1,
+    "fireAnimationTicks": 29,
+    "firstShotCountDownTicksRange": [
+     0,
+     150
+    ],
+    "nextShotCountDownTicksRange": [
+     136,
+     150
+    ],
+    "_source": [
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 2453
+     },
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 5333
+     },
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 2557
+     }
+    ],
+    "chill": {
+     "speedFactor": 0.4,
+     "durationTicks": 1000,
+     "durationSeconds": 10.0,
+     "_source": {
+      "file": "Lawn/Zombie.cs",
+      "line": 2259
+     }
+    }
+   },
+   "production": null,
+   "special": null,
+   "reanimation": {
+    "type": "Snowpea",
+    "resourcePath": "spanim/snowpea",
+    "isSpine": true,
+    "legacyResourcePath": "reanim/SnowPea",
+    "spineScale": 16.0,
+    "_source": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 164
+    }
+   },
+   "_source": {
+    "definition": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 1052
+    },
+    "class": {
+     "file": "Lawn/Plant.cs",
+     "line": 12
+    }
+   }
+  },
+  {
+   "seedType": "Chomper",
+   "displayNameKey": "CHOMPER",
+   "localizedNames": {
+    "en": "Chomper",
+    "zh_cn": "大嘴花"
+   },
+   "sunCost": 150,
+   "refreshTicks": 750,
+   "refreshSeconds": 7.5,
+   "packetIndex": 31,
+   "subClass": "Normal",
+   "health": 300,
+   "healthSource": {
+    "file": "Lawn/Plant.cs",
+    "line": 2762
+   },
+   "launchRateTicks": 0,
+   "launchRateSeconds": 0.0,
+   "attack": null,
+   "production": null,
+   "special": {
+    "kind": "chomper",
+    "biteWindupTicks": 70,
+    "instaKill": true,
+    "gargantuarDamage": 40,
+    "digestTicks": 4000,
+    "digestSeconds": 40.0,
+    "attackRectOffsetX": 80,
+    "_source": [
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 4340
+     },
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 3509
+     }
+    ]
+   },
+   "reanimation": {
+    "type": "Chomper",
+    "resourcePath": "spanim/chomper",
+    "isSpine": true,
+    "legacyResourcePath": "reanim/Chomper",
+    "spineScale": 16.0,
+    "_source": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 171
+    }
+   },
+   "_source": {
+    "definition": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 1053
+    },
+    "class": {
+     "file": "Lawn/Plant.cs",
+     "line": 12
+    }
+   }
+  },
+  {
+   "seedType": "Potatomine",
+   "displayNameKey": "POTATO_MINE",
+   "localizedNames": {
+    "en": "Potato Mine",
+    "zh_cn": "土豆雷"
+   },
+   "sunCost": 25,
+   "refreshTicks": 3000,
+   "refreshSeconds": 30.0,
+   "packetIndex": 37,
+   "subClass": "Normal",
+   "health": 300,
+   "healthSource": {
+    "file": "Lawn/Plant.cs",
+    "line": 2762
+   },
+   "launchRateTicks": 0,
+   "launchRateSeconds": 0.0,
+   "attack": null,
+   "production": null,
+   "special": {
+    "kind": "mine",
+    "armTicks": 1500,
+    "armSeconds": 15.0,
+    "damage": 1800,
+    "burn": false,
+    "radius": 60,
+    "rowRange": 0,
+    "trigger": "armed state explodes on first zombie in row",
+    "selfDestructs": true,
+    "_source": [
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 5031
+     },
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 1504
+     }
+    ]
+   },
+   "reanimation": {
+    "type": "Potatomine",
+    "resourcePath": "reanim/PotatoMine",
+    "isSpine": false,
+    "legacyResourcePath": null,
+    "spineScale": null,
+    "_source": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 174
+    }
+   },
+   "_source": {
+    "definition": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 1051
+    },
+    "class": {
+     "file": "Lawn/Plant.cs",
+     "line": 12
+    }
+   }
+  },
+  {
+   "seedType": "Repeater",
+   "displayNameKey": "REPEATER",
+   "localizedNames": {
+    "en": "Repeater",
+    "zh_cn": "双发射手"
+   },
+   "sunCost": 200,
+   "refreshTicks": 750,
+   "refreshSeconds": 7.5,
+   "packetIndex": 5,
+   "subClass": "Shooter",
+   "health": 300,
+   "healthSource": {
+    "file": "Lawn/Plant.cs",
+    "line": 2762
+   },
+   "launchRateTicks": 150,
+   "launchRateSeconds": 1.5,
+   "attack": {
+    "projectileType": "Pea",
+    "projectileDamage": 20,
+    "projectileSpeedPxPerTick": 3.33,
+    "projectileSpeedPxPerSecond": 333.0,
+    "shotsPerAttackCycle": 2,
+    "fireAnimationTicks": 26,
+    "firstShotCountDownTicksRange": [
+     0,
+     150
+    ],
+    "nextShotCountDownTicksRange": [
+     136,
+     150
+    ],
+    "_source": [
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 2453
+     },
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 5333
+     },
+     {
+      "file": "Lawn/Plant.cs",
+      "line": 2557
+     }
+    ],
+    "secondShotTriggerCounter": 25,
+    "secondShotPolicy": "UpdateShooter() re-triggers FindTargetAndFire with LaunchTime.RepeaterPrelaunch when mLaunchCounter == 25"
+   },
+   "production": null,
+   "special": null,
+   "reanimation": {
+    "type": "Repeater",
+    "resourcePath": "spanim/repeater",
+    "isSpine": true,
+    "legacyResourcePath": "reanim/PeaShooter",
+    "spineScale": 16.0,
+    "_source": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 165
+    }
+   },
+   "_source": {
+    "definition": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 1054
+    },
+    "class": {
+     "file": "Lawn/Plant.cs",
+     "line": 12
+    }
+   }
+  },
+  {
+   "seedType": "ExplodeONut",
+   "displayNameKey": "EXPLODE_O_NUT",
+   "localizedNames": {
+    "en": "Explode-o-nut",
+    "zh_cn": "爆炸坚果"
+   },
+   "sunCost": 0,
+   "refreshTicks": 3000,
+   "refreshSeconds": 30.0,
+   "packetIndex": 2,
+   "subClass": "Normal",
+   "health": 4000,
+   "healthSource": {
+    "file": "Lawn/Plant.cs",
+    "line": 2762
+   },
+   "launchRateTicks": 0,
+   "launchRateSeconds": 0.0,
+   "attack": null,
+   "production": null,
+   "special": {
+    "kind": "deathExplosion",
+    "damage": 1800,
+    "burn": true,
+    "radius": 90,
+    "rowRange": 1,
+    "_source": {
+     "file": "Lawn/Plant.cs",
+     "line": 1504
+    }
+   },
+   "reanimation": {
+    "type": "Wallnut",
+    "resourcePath": "reanim/Wallnut",
+    "isSpine": false,
+    "legacyResourcePath": null,
+    "spineScale": null,
+    "_source": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 156
+    }
+   },
+   "_source": {
+    "definition": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 1101
+    },
+    "class": {
+     "file": "Lawn/Plant.cs",
+     "line": 12
+    }
+   }
+  }
+ ]
+}

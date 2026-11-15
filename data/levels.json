@@ -1,0 +1,4737 @@
+{
+ "_schema": {
+  "description": "Adventure mode level + wave data for levels 1,2,3,4,5,6,7,8,9,10, extracted from the decompiled PlantGirlsVsZombies C#.",
+  "tickMilliseconds": 10,
+  "ticksPerSecond": 100,
+  "timeUnit": "1 tick = one game update = 10 ms (Sexy/Main.cs:39 TargetElapsedTime = 0.01 s)",
+  "levelFields": {
+   "level": "Adventure level number, 1-based (Board.mLevel / PlayerInfo.mLevel)",
+   "stage": "world-sub label, LawnApp.GetStageString",
+   "background": "BackgroundType + image resource id/path (Board.PickBackground)",
+   "startingSun": "Board.InitLevel mSunMoney",
+   "seedBank": "kind=fixed|playerChosen|conveyor. For playerChosen/conveyor the ordered packet list is null (packets:null, equivalent to seedBank:null); playerChosen lists chooserOffers, conveyor lists its cardPool/initialCards",
+   "numWaves": "GameConstants.gZombieWaves[level-1] for first-time Adventure",
+   "flagWaves": "indices where IsFlagWave() is true",
+   "wavesPerFlag": "GetNumWavesPerFlag(); first-time levels with <10 waves use numWaves => only the last wave is a flag wave",
+   "progressMeter": "progress bar / flag meter widths (pixels)",
+   "zombieSpawning": "wave countdown rules from Board.UpdateZombieSpawning",
+   "introducedZombie": "GetIntroducedZombieType() for the level, or null",
+   "allowedZombies": "CanZombieSpawnOnLevel() true set with point cost/weight",
+   "waves": "generated wave table",
+   "waveRngCalls": "number of RNG draws used to generate the wave table"
+  },
+  "waveFields": {
+   "index": "0-based wave index; Board.mCurrentWave at spawn time",
+   "flag": "IsFlagWave(index) - flag 'huge wave'",
+   "initialZombiePoints": "i/3 + 1 (first-time Adventure formula, Board.PickZombieWaves)",
+   "flagPointMultiplier": "2.5 on flag waves, else 1.0",
+   "modePointMultiplier": "4 on Wall-nut Bowling (1-5), 3 on mini-boss (1-10), else 1",
+   "zombiePointsBeforeRandomPicks": "remaining point budget when the random pick loop starts (may be negative after forced zombies)",
+   "zombiePointsRemaining": "budget after the random pick loop",
+   "zombies": "ordered list of ZombieType names; order is the spawn order used by Board.SpawnZombieWave (mZombiesInWave[row0..n])",
+   "counts": "per-type counts",
+   "forced": "flagEscortNormals: min(points,8) Normal zombies + 1 Flag inserted on a flag wave; introduced: ZombieDefinition with startingLevel == level inserted at middle and last wave; missingZombies: PutInMissingZombies adds every allowed type not yet present in the last wave"
+  },
+  "waveGeneration": {
+   "algorithm": "Board.PickZombieWaves + Board.PickZombieType + Board.PutZombieInWave + Board.PutInMissingZombies (Board.cs:8392, :2312, :12195, :12226)",
+   "rng": "the original uses Sexy.RandomNumbers -> MersenneTwister MTRandom.Create(MTEdition.CokOpt_19937) seeded at process start, so wave contents differ per run. This JSON was produced by re-implementing the picker with a documented deterministic RNG seed, giving one valid, reproducible realisation.",
+   "seed": 20261114,
+   "rngPerLevelSeed": "\"pgvz-level-waves:<seed>:<level>\" passed to Python random.Random",
+   "normalZombieAlwaysPickable": "Normal has zombieValue 1 / firstAllowedWave 1, so the final wave random loop can always drain the point budget"
+  },
+  "_unresolved": [
+   "Exact RNG sequence cannot be reproduced (runtime-seeded MersenneTwister); wave lists are one reproducible realisation, see _schema.waveGeneration.rng.",
+   "Zombie spawn row is chosen at runtime by Board.PickRowForNewZombie (weighted, prefers rows that were not recently lawn-mowered); rows are therefore not part of the data model.",
+   "Levels 11-50 use the same Board.InitZombieWaves path but special levels (15,20,25,30,35,40,45,50) branch into Challenge.InitZombieWaves and are out of scope for this pass."
+  ]
+ },
+ "_meta": {
+  "game": "PlantGirlsVsZombies (PGvZ 1.3.2)",
+  "gameMode": "Adventure (first play-through)",
+  "generatedBy": "plangirls-web/tools/extract_levels.py",
+  "seed": 20261114,
+  "sourceRoot": "D:\\逆向\\output\\PlantGirlsVsZombies\\decompiled\\Lawn",
+  "tickRate": {
+   "ticksPerSecond": 100,
+   "tickMilliseconds": 10,
+   "_source": {
+    "file": "Sexy/Main.cs",
+    "line": 39
+   }
+  },
+  "constants": {
+   "TICKS_BETWEEN_EATS": 4,
+   "CHILLED_SPEED_FACTOR": 0.4,
+   "MAX_ZOMBIES_IN_WAVE": 50,
+   "firstTimeAdventureFixedSeedBankLevelsInclusive": [
+    1,
+    7
+   ],
+   "chooserLevelsInclusive": [
+    8,
+    9
+   ],
+   "conveyorLevels": [
+    5,
+    10
+   ]
+  },
+  "_source": {
+   "TICKS_BETWEEN_EATS": {
+    "file": "Lawn/GameConstants.cs",
+    "line": 1178
+   },
+   "CHILLED_SPEED_FACTOR": {
+    "file": "Lawn/GameConstants.cs",
+    "line": 1157
+   },
+   "tickRate": {
+    "file": "Sexy/Main.cs",
+    "line": 39
+   },
+   "rng": {
+    "file": "Sexy/RandomNumbers.cs",
+    "line": 42
+   },
+   "weightedPick": {
+    "file": "Sexy/TodLib/TodCommon.cs",
+    "line": 195
+   },
+   "randRangeInt": {
+    "file": "Sexy/TodLib/TodCommon.cs",
+    "line": 308
+   },
+   "peaSpeed": {
+    "file": "Lawn/Projectile.cs",
+    "line": 1399
+   },
+   "initLevel": {
+    "file": "Lawn/Board.cs",
+    "line": 1571
+   },
+   "initZombieWaves": {
+    "file": "Lawn/Board.cs",
+    "line": 9864
+   },
+   "initZombieWavesForLevel": {
+    "file": "Lawn/Board.cs",
+    "line": 10099
+   },
+   "pickZombieWaves": {
+    "file": "Lawn/Board.cs",
+    "line": 8392
+   },
+   "pickZombieType": {
+    "file": "Lawn/Board.cs",
+    "line": 2312
+   },
+   "updateZombieSpawning": {
+    "file": "Lawn/Board.cs",
+    "line": 7297
+   },
+   "spawnZombieWave": {
+    "file": "Lawn/Board.cs",
+    "line": 2601
+   },
+   "canZombieSpawnOnLevel": {
+    "file": "Lawn/Board.cs",
+    "line": 9323
+   },
+   "isFlagWave": {
+    "file": "Lawn/Board.cs",
+    "line": 11773
+   },
+   "getNumWavesPerFlag": {
+    "file": "Lawn/Board.cs",
+    "line": 12977
+   },
+   "putInMissingZombies": {
+    "file": "Lawn/Board.cs",
+    "line": 12226
+   },
+   "getIntroducedZombieType": {
+    "file": "Lawn/Board.cs",
+    "line": 10946
+   },
+   "updateProgressMeter": {
+    "file": "Lawn/Board.cs",
+    "line": 9096
+   },
+   "pickBackground": {
+    "file": "Lawn/Board.cs",
+    "line": 9383
+   },
+   "loadBackgroundImages": {
+    "file": "Lawn/Board.cs",
+    "line": 13059
+   },
+   "chooseSeeds": {
+    "file": "Lawn/Board.cs",
+    "line": 5259
+   },
+   "getNumSeedsInBank": {
+    "file": "Lawn/Board.cs",
+    "line": 5273
+   },
+   "hasConveyorBeltSeedBank": {
+    "file": "Lawn/Board.cs",
+    "line": 11866
+   },
+   "updateSunSpawning": {
+    "file": "Lawn/Board.cs",
+    "line": 7442
+   },
+   "updateGame": {
+    "file": "Lawn/Board.cs",
+    "line": 10026
+   },
+   "level2InitialCountDown": {
+    "file": "Lawn/Board.cs",
+    "line": 9921
+   },
+   "wallnutBowlingInitialCountDown": {
+    "file": "Lawn/Challenge.cs",
+    "line": 442
+   },
+   "normalWaveCountDown": {
+    "file": "Lawn/Board.cs",
+    "line": 7427
+   },
+   "sunInitialRange": {
+    "file": "Lawn/Board.cs",
+    "line": 1671
+   },
+   "sunRespawn": {
+    "file": "Lawn/Board.cs",
+    "line": 7489
+   },
+   "startSunLevel1": {
+    "file": "Lawn/Board.cs",
+    "line": 1632
+   },
+   "startSunDefault": {
+    "file": "Lawn/Board.cs",
+    "line": 1646
+   },
+   "awardSeedForLevel": {
+    "file": "Lawn/LawnApp.cs",
+    "line": 2666
+   },
+   "getSeedsAvailable": {
+    "file": "Lawn/LawnApp.cs",
+    "line": 2349
+   },
+   "hasSeedType": {
+    "file": "Lawn/LawnApp.cs",
+    "line": 2493
+   },
+   "numSeedsInBankFormula": {
+    "file": "Lawn/Board.cs",
+    "line": 5351
+   },
+   "conveyor": {
+    "file": "Lawn/Board.cs",
+    "line": 11866
+   },
+   "getBaseHealth": {
+    "file": "Lawn/Plant.cs",
+    "line": 2762
+   },
+   "plantInitialize": {
+    "file": "Lawn/Plant.cs",
+    "line": 204
+   },
+   "updateProductionPlant": {
+    "file": "Lawn/Plant.cs",
+    "line": 2346
+   },
+   "updateShooter": {
+    "file": "Lawn/Plant.cs",
+    "line": 2453
+   },
+   "findTargetAndFire": {
+    "file": "Lawn/Plant.cs",
+    "line": 2557
+   },
+   "updateShooting": {
+    "file": "Lawn/Plant.cs",
+    "line": 5333
+   },
+   "doSpecial": {
+    "file": "Lawn/Plant.cs",
+    "line": 1504
+   },
+   "updatePotato": {
+    "file": "Lawn/Plant.cs",
+    "line": 5031
+   },
+   "updateChomper": {
+    "file": "Lawn/Plant.cs",
+    "line": 4340
+   },
+   "makesSun": {
+    "file": "Lawn/Plant.cs",
+    "line": 4159
+   },
+   "getPlantAttackRect": {
+    "file": "Lawn/Plant.cs",
+    "line": 3509
+   },
+   "isUpgrade": {
+    "file": "Lawn/Plant.cs",
+    "line": 3061
+   },
+   "chomper": {
+    "file": "Lawn/Plant.cs",
+    "line": 4340
+   },
+   "chill": {
+    "file": "Lawn/Zombie.cs",
+    "line": 2259
+   },
+   "zombieInitialize": {
+    "file": "Lawn/Zombie.cs",
+    "line": 299
+   },
+   "getBaseBodyHealth": {
+    "file": "Lawn/Zombie.cs",
+    "line": 12179
+   },
+   "getBaseHelmHealth": {
+    "file": "Lawn/Zombie.cs",
+    "line": 12231
+   },
+   "getBaseShieldHealth": {
+    "file": "Lawn/Zombie.cs",
+    "line": 12285
+   },
+   "pickRandomSpeed": {
+    "file": "Lawn/Zombie.cs",
+    "line": 2473
+   },
+   "eatPlant": {
+    "file": "Lawn/Zombie.cs",
+    "line": 1282
+   },
+   "checkIfPreyCaught": {
+    "file": "Lawn/Zombie.cs",
+    "line": 1214
+   },
+   "updateWalking": {
+    "file": "Lawn/Zombie.cs",
+    "line": 3844
+   },
+   "updateWalkingIntoHouse": {
+    "file": "Lawn/Zombie.cs",
+    "line": 3953
+   },
+   "updatePolevaulter": {
+    "file": "Lawn/Zombie.cs",
+    "line": 2534
+   },
+   "baseBodyHealth270": {
+    "file": "Lawn/Zombie.cs",
+    "line": 384
+   },
+   "gZombieWaves": {
+    "file": "Lawn/GameConstants.cs",
+    "line": 787
+   },
+   "gZombieAllowedLevels": {
+    "file": "Lawn/GameConstants.cs",
+    "line": 797
+   },
+   "gPlantDefs": {
+    "file": "Lawn/GameConstants.cs",
+    "line": 1045
+   },
+   "gZombieDefs": {
+    "file": "Lawn/GameConstants.cs",
+    "line": 1217
+   },
+   "gProjectileDefinition": {
+    "file": "Lawn/GameConstants.cs",
+    "line": 1395
+   },
+   "gLawnReanimationArray": {
+    "file": "Lawn/GameConstants.cs",
+    "line": 149
+   },
+   "killAllZombiesInRadius": {
+    "file": "Lawn/Board.cs",
+    "line": 11720
+   },
+   "applyChill": {
+    "file": "Lawn/Zombie.cs",
+    "line": 2259
+   },
+   "updateNormalMotion": {
+    "file": "Lawn/Projectile.cs",
+    "line": 1288
+   },
+   "updateZombieWalking": {
+    "file": "Lawn/Zombie.cs",
+    "line": 3844
+   },
+   "getSunValue": {
+    "file": "Lawn/Coin.cs",
+    "line": 1106
+   },
+   "stageIsNight": {
+    "file": "Lawn/Board.cs",
+    "line": 5367
+   }
+  },
+  "_sourceTables": {
+   "zombieWaves": {
+    "file": "Lawn/GameConstants.cs",
+    "line": 787
+   },
+   "zombieAllowedLevels": {
+    "file": "Lawn/GameConstants.cs",
+    "line": 797
+   },
+   "zombieDefinitions": {
+    "file": "Lawn/GameConstants.cs",
+    "line": 1217
+   },
+   "zombieWeightsAndPoints": {
+    "file": "Lawn/Board.cs",
+    "line": 2312
+   },
+   "waveGenerator": {
+    "file": "Lawn/Board.cs",
+    "line": 8392
+   },
+   "flagWaveRule": {
+    "file": "Lawn/Board.cs",
+    "line": 11773
+   },
+   "wavesPerFlag": {
+    "file": "Lawn/Board.cs",
+    "line": 12977
+   },
+   "allowedZombieRule": {
+    "file": "Lawn/Board.cs",
+    "line": 9323
+   },
+   "introducedZombie": {
+    "file": "Lawn/Board.cs",
+    "line": 10946
+   },
+   "missingZombies": {
+    "file": "Lawn/Board.cs",
+    "line": 12226
+   },
+   "countDown": {
+    "file": "Lawn/Board.cs",
+    "line": 7297
+   },
+   "spawn": {
+    "file": "Lawn/Board.cs",
+    "line": 2601
+   },
+   "progressMeter": {
+    "file": "Lawn/Board.cs",
+    "line": 9096
+   },
+   "seedBank": {
+    "file": "Lawn/Board.cs",
+    "line": 5259
+   },
+   "numSeedsInBank": {
+    "file": "Lawn/Board.cs",
+    "line": 5273
+   },
+   "conveyorBelt": {
+    "file": "Lawn/Board.cs",
+    "line": 11866
+   },
+   "background": {
+    "file": "Lawn/Board.cs",
+    "line": 9383
+   },
+   "sunSpawning": {
+    "file": "Lawn/Board.cs",
+    "line": 7442
+   }
+  },
+  "_assumptions": [
+   "Fresh profile: no store purchases (mPurchases[] all 0) and mPurchases[21]=0 (seed packet upgrade not bought) -> GetNumSeedsInBank uses base 6 packets.",
+   "Adventure mode, first play-through (HasFinishedAdventure()==false).",
+   "Non-hard Adventure (mAdventureModeHard==false).",
+   "Level is played normally (not Quick Play which maps to QuickplayXX modes)."
+  ]
+ },
+ "levels": [
+  {
+   "level": 1,
+   "stage": "1-1",
+   "world": 1,
+   "worldSub": 1,
+   "gameMode": "Adventure",
+   "firstTimeAdventure": true,
+   "background": {
+    "type": "Num1Day",
+    "imageResource": "IMAGE_BACKGROUND1",
+    "resourcePath": "images/background1_hd",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9383
+    }
+   },
+   "startingSun": 150,
+   "startingSunNote": "Board.InitLevel: 150 for first-time level 1, otherwise 50",
+   "seedBank": {
+    "kind": "fixed",
+    "packets": [
+     "Peashooter"
+    ],
+    "numPackets": 1,
+    "chooseSeedsOnCurrentLevel": false,
+    "note": "First-time Adventure levels 1-7 skip the seed chooser; the bank receives SeedType values 0..numPackets-1 in enum order (Board.InitLevel Board.cs:1854). numPackets is limited by GetSeedsAvailable() on a fresh profile.",
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 5259
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 5351
+     }
+    ]
+   },
+   "numWaves": 4,
+   "flagWaves": [],
+   "wavesPerFlag": 4,
+   "progressMeter": {
+    "hasFlags": false,
+    "wavesPerFlag": 4,
+    "totalWidthPixels": 150,
+    "flagNotchPixels": 12,
+    "note": "Board.UpdateProgressMeter / DrawProgressMeter; mProgressMeterWidth in pixels",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9096
+    }
+   },
+   "zombieSpawning": {
+    "initialWaveCountDownTicks": 1800,
+    "initialWaveCountDownNote": "default (Board.InitZombieWaves)",
+    "initialWaveCountDownSource": {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    "nonFlagWaveCountDown": {
+     "baseTicks": 2500,
+     "randomExtraMaxExclusive": 600,
+     "note": "2500 + RandomNumbers.NextNumber(600)",
+     "_source": {
+      "file": "Lawn/Board.cs",
+      "line": 7427
+     }
+    },
+    "flagWaveCountDownTicks": 4500,
+    "flagWaveCountDownNote": "set when the just-spawned wave was a flag wave",
+    "healthToNextWaveFractionRange": [
+     0.5,
+     0.65
+    ],
+    "healthShortcut": {
+     "minWaveAgeTicks": 400,
+     "minCountDownTicks": 200,
+     "note": "if the previous wave's remaining total HP <= mZombieHealthToNextWave and the countdown is still > 200, the countdown is shortened to 200"
+    },
+    "hugeWaveCountDownTicks": 750,
+    "hugeWaveTrigger": "mZombieCountDown == 5 on a flag wave; after the 750-tick warning the current wave spawns next (countdown set to 1)",
+    "finalWaveSoundDelayTicks": 60,
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 7297
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 2601
+     }
+    ]
+   },
+   "introducedZombie": null,
+   "allowedZombies": [
+    {
+     "zombieType": "Normal",
+     "zombieValue": 1,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    }
+   ],
+   "waves": [
+    {
+     "index": 0,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 1,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 2,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 3,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": [
+       "Normal"
+      ]
+     }
+    }
+   ],
+   "waveRngCalls": 4,
+   "special": {
+    "tutorial": "peashooter tutorial, no flag waves"
+   },
+   "_source": [
+    {
+     "file": "Lawn/Board.cs",
+     "line": 1571
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 8392
+    }
+   ]
+  },
+  {
+   "level": 2,
+   "stage": "1-2",
+   "world": 1,
+   "worldSub": 2,
+   "gameMode": "Adventure",
+   "firstTimeAdventure": true,
+   "background": {
+    "type": "Num1Day",
+    "imageResource": "IMAGE_BACKGROUND1",
+    "resourcePath": "images/background1_hd",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9383
+    }
+   },
+   "startingSun": 50,
+   "startingSunNote": "Board.InitLevel: 150 for first-time level 1, otherwise 50",
+   "seedBank": {
+    "kind": "fixed",
+    "packets": [
+     "Peashooter",
+     "Sunflower"
+    ],
+    "numPackets": 2,
+    "chooseSeedsOnCurrentLevel": false,
+    "note": "First-time Adventure levels 1-7 skip the seed chooser; the bank receives SeedType values 0..numPackets-1 in enum order (Board.InitLevel Board.cs:1854). numPackets is limited by GetSeedsAvailable() on a fresh profile.",
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 5259
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 5351
+     }
+    ]
+   },
+   "numWaves": 6,
+   "flagWaves": [
+    5
+   ],
+   "wavesPerFlag": 6,
+   "progressMeter": {
+    "hasFlags": true,
+    "wavesPerFlag": 6,
+    "totalWidthPixels": 150,
+    "flagNotchPixels": 12,
+    "note": "Board.UpdateProgressMeter / DrawProgressMeter; mProgressMeterWidth in pixels",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9096
+    }
+   },
+   "zombieSpawning": {
+    "initialWaveCountDownTicks": 5000,
+    "initialWaveCountDownNote": "level 2 first-time tutorial delay",
+    "initialWaveCountDownSource": {
+     "file": "Lawn/Board.cs",
+     "line": 9921
+    },
+    "nonFlagWaveCountDown": {
+     "baseTicks": 2500,
+     "randomExtraMaxExclusive": 600,
+     "note": "2500 + RandomNumbers.NextNumber(600)",
+     "_source": {
+      "file": "Lawn/Board.cs",
+      "line": 7427
+     }
+    },
+    "flagWaveCountDownTicks": 4500,
+    "flagWaveCountDownNote": "set when the just-spawned wave was a flag wave",
+    "healthToNextWaveFractionRange": [
+     0.5,
+     0.65
+    ],
+    "healthShortcut": {
+     "minWaveAgeTicks": 400,
+     "minCountDownTicks": 200,
+     "note": "if the previous wave's remaining total HP <= mZombieHealthToNextWave and the countdown is still > 200, the countdown is shortened to 200"
+    },
+    "hugeWaveCountDownTicks": 750,
+    "hugeWaveTrigger": "mZombieCountDown == 5 on a flag wave; after the 750-tick warning the current wave spawns next (countdown set to 1)",
+    "finalWaveSoundDelayTicks": 60,
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 7297
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 2601
+     }
+    ]
+   },
+   "introducedZombie": null,
+   "allowedZombies": [
+    {
+     "zombieType": "Normal",
+     "zombieValue": 1,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    }
+   ],
+   "waves": [
+    {
+     "index": 0,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 1,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 2,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 3,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 4,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 5,
+     "flag": true,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 2.5,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Flag",
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Flag": 1,
+      "Normal": 4
+     },
+     "forced": {
+      "flagEscortNormals": 2,
+      "flagZombie": true,
+      "introduced": null,
+      "missingZombies": []
+     }
+    }
+   ],
+   "waveRngCalls": 9,
+   "special": {
+    "tutorial": "sunflower tutorial (mZombieCountDown = 5000)"
+   },
+   "_source": [
+    {
+     "file": "Lawn/Board.cs",
+     "line": 1571
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 8392
+    }
+   ]
+  },
+  {
+   "level": 3,
+   "stage": "1-3",
+   "world": 1,
+   "worldSub": 3,
+   "gameMode": "Adventure",
+   "firstTimeAdventure": true,
+   "background": {
+    "type": "Num1Day",
+    "imageResource": "IMAGE_BACKGROUND1",
+    "resourcePath": "images/background1_hd",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9383
+    }
+   },
+   "startingSun": 50,
+   "startingSunNote": "Board.InitLevel: 150 for first-time level 1, otherwise 50",
+   "seedBank": {
+    "kind": "fixed",
+    "packets": [
+     "Peashooter",
+     "Sunflower",
+     "Cherrybomb"
+    ],
+    "numPackets": 3,
+    "chooseSeedsOnCurrentLevel": false,
+    "note": "First-time Adventure levels 1-7 skip the seed chooser; the bank receives SeedType values 0..numPackets-1 in enum order (Board.InitLevel Board.cs:1854). numPackets is limited by GetSeedsAvailable() on a fresh profile.",
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 5259
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 5351
+     }
+    ]
+   },
+   "numWaves": 8,
+   "flagWaves": [
+    7
+   ],
+   "wavesPerFlag": 8,
+   "progressMeter": {
+    "hasFlags": true,
+    "wavesPerFlag": 8,
+    "totalWidthPixels": 150,
+    "flagNotchPixels": 12,
+    "note": "Board.UpdateProgressMeter / DrawProgressMeter; mProgressMeterWidth in pixels",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9096
+    }
+   },
+   "zombieSpawning": {
+    "initialWaveCountDownTicks": 1800,
+    "initialWaveCountDownNote": "default (Board.InitZombieWaves)",
+    "initialWaveCountDownSource": {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    "nonFlagWaveCountDown": {
+     "baseTicks": 2500,
+     "randomExtraMaxExclusive": 600,
+     "note": "2500 + RandomNumbers.NextNumber(600)",
+     "_source": {
+      "file": "Lawn/Board.cs",
+      "line": 7427
+     }
+    },
+    "flagWaveCountDownTicks": 4500,
+    "flagWaveCountDownNote": "set when the just-spawned wave was a flag wave",
+    "healthToNextWaveFractionRange": [
+     0.5,
+     0.65
+    ],
+    "healthShortcut": {
+     "minWaveAgeTicks": 400,
+     "minCountDownTicks": 200,
+     "note": "if the previous wave's remaining total HP <= mZombieHealthToNextWave and the countdown is still > 200, the countdown is shortened to 200"
+    },
+    "hugeWaveCountDownTicks": 750,
+    "hugeWaveTrigger": "mZombieCountDown == 5 on a flag wave; after the 750-tick warning the current wave spawns next (countdown set to 1)",
+    "finalWaveSoundDelayTicks": 60,
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 7297
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 2601
+     }
+    ]
+   },
+   "introducedZombie": "TrafficCone",
+   "allowedZombies": [
+    {
+     "zombieType": "Normal",
+     "zombieValue": 1,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    },
+    {
+     "zombieType": "TrafficCone",
+     "zombieValue": 2,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    }
+   ],
+   "waves": [
+    {
+     "index": 0,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 1,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 2,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 3,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 4,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 0,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone"
+     ],
+     "counts": {
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": "TrafficCone",
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 5,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 6,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 7,
+     "flag": true,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 2.5,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal",
+      "Flag",
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Flag": 1,
+      "Normal": 4,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 3,
+      "flagZombie": true,
+      "introduced": "TrafficCone",
+      "missingZombies": []
+     }
+    }
+   ],
+   "waveRngCalls": 10,
+   "special": null,
+   "_source": [
+    {
+     "file": "Lawn/Board.cs",
+     "line": 1571
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 8392
+    }
+   ]
+  },
+  {
+   "level": 4,
+   "stage": "1-4",
+   "world": 1,
+   "worldSub": 4,
+   "gameMode": "Adventure",
+   "firstTimeAdventure": true,
+   "background": {
+    "type": "Num1Day",
+    "imageResource": "IMAGE_BACKGROUND1",
+    "resourcePath": "images/background1_hd",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9383
+    }
+   },
+   "startingSun": 50,
+   "startingSunNote": "Board.InitLevel: 150 for first-time level 1, otherwise 50",
+   "seedBank": {
+    "kind": "fixed",
+    "packets": [
+     "Peashooter",
+     "Sunflower",
+     "Cherrybomb",
+     "Wallnut"
+    ],
+    "numPackets": 4,
+    "chooseSeedsOnCurrentLevel": false,
+    "note": "First-time Adventure levels 1-7 skip the seed chooser; the bank receives SeedType values 0..numPackets-1 in enum order (Board.InitLevel Board.cs:1854). numPackets is limited by GetSeedsAvailable() on a fresh profile.",
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 5259
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 5351
+     }
+    ]
+   },
+   "numWaves": 10,
+   "flagWaves": [
+    9
+   ],
+   "wavesPerFlag": 10,
+   "progressMeter": {
+    "hasFlags": true,
+    "wavesPerFlag": 10,
+    "totalWidthPixels": 150,
+    "flagNotchPixels": 12,
+    "note": "Board.UpdateProgressMeter / DrawProgressMeter; mProgressMeterWidth in pixels",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9096
+    }
+   },
+   "zombieSpawning": {
+    "initialWaveCountDownTicks": 1800,
+    "initialWaveCountDownNote": "default (Board.InitZombieWaves)",
+    "initialWaveCountDownSource": {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    "nonFlagWaveCountDown": {
+     "baseTicks": 2500,
+     "randomExtraMaxExclusive": 600,
+     "note": "2500 + RandomNumbers.NextNumber(600)",
+     "_source": {
+      "file": "Lawn/Board.cs",
+      "line": 7427
+     }
+    },
+    "flagWaveCountDownTicks": 4500,
+    "flagWaveCountDownNote": "set when the just-spawned wave was a flag wave",
+    "healthToNextWaveFractionRange": [
+     0.5,
+     0.65
+    ],
+    "healthShortcut": {
+     "minWaveAgeTicks": 400,
+     "minCountDownTicks": 200,
+     "note": "if the previous wave's remaining total HP <= mZombieHealthToNextWave and the countdown is still > 200, the countdown is shortened to 200"
+    },
+    "hugeWaveCountDownTicks": 750,
+    "hugeWaveTrigger": "mZombieCountDown == 5 on a flag wave; after the 750-tick warning the current wave spawns next (countdown set to 1)",
+    "finalWaveSoundDelayTicks": 60,
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 7297
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 2601
+     }
+    ]
+   },
+   "introducedZombie": null,
+   "allowedZombies": [
+    {
+     "zombieType": "Normal",
+     "zombieValue": 1,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    },
+    {
+     "zombieType": "TrafficCone",
+     "zombieValue": 2,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    }
+   ],
+   "waves": [
+    {
+     "index": 0,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 1,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 2,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 3,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone"
+     ],
+     "counts": {
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 4,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 5,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone"
+     ],
+     "counts": {
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 6,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 7,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 8,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 9,
+     "flag": true,
+     "initialZombiePoints": 4,
+     "flagPointMultiplier": 2.5,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Flag",
+      "TrafficCone",
+      "Normal",
+      "TrafficCone"
+     ],
+     "counts": {
+      "Flag": 1,
+      "Normal": 5,
+      "TrafficCone": 2
+     },
+     "forced": {
+      "flagEscortNormals": 4,
+      "flagZombie": true,
+      "introduced": null,
+      "missingZombies": [
+       "TrafficCone"
+      ]
+     }
+    }
+   ],
+   "waveRngCalls": 15,
+   "special": null,
+   "_source": [
+    {
+     "file": "Lawn/Board.cs",
+     "line": 1571
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 8392
+    }
+   ]
+  },
+  {
+   "level": 5,
+   "stage": "1-5",
+   "world": 1,
+   "worldSub": 5,
+   "gameMode": "Adventure",
+   "firstTimeAdventure": true,
+   "background": {
+    "type": "Num1Day",
+    "imageResource": "IMAGE_BACKGROUND1",
+    "resourcePath": "images/background1_hd",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9383
+    }
+   },
+   "startingSun": 50,
+   "startingSunNote": "Board.InitLevel: 150 for first-time level 1, otherwise 50",
+   "seedBank": {
+    "kind": "conveyor",
+    "packets": null,
+    "numPackets": 10,
+    "initialCards": [
+     "Wallnut"
+    ],
+    "cardPool": [
+     {
+      "seed": "Wallnut",
+      "weight": 85
+     },
+     {
+      "seed": "ExplodeONut",
+      "weight": 15
+     }
+    ],
+    "firstCardCountDownTicks": 400,
+    "replenishCountDownTicks": {
+     "emptyBelt": 400,
+     "gt4Cards": 425,
+     "gt6Cards": 500,
+     "gt8Cards": 1000,
+     "_note": "Challenge.UpdateConveyorBelt() (Challenge.cs:3669); counter decrements once per tick.",
+     "_source": {
+      "file": "Lawn/Challenge.cs",
+      "line": 3669
+     }
+    },
+    "special": "WallnutBowling",
+    "note": "Adventure 1-5 is a Wall-nut Bowling level: conveyor belt seed bank, no hand-picked seeds.",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 11866
+    }
+   },
+   "numWaves": 8,
+   "flagWaves": [
+    7
+   ],
+   "wavesPerFlag": 8,
+   "progressMeter": {
+    "hasFlags": true,
+    "wavesPerFlag": 8,
+    "totalWidthPixels": 150,
+    "flagNotchPixels": 12,
+    "note": "Board.UpdateProgressMeter / DrawProgressMeter; mProgressMeterWidth in pixels",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9096
+    }
+   },
+   "zombieSpawning": {
+    "initialWaveCountDownTicks": 200,
+    "initialWaveCountDownNote": "Wall-nut Bowling: Challenge.InitLevel override",
+    "initialWaveCountDownSource": {
+     "file": "Lawn/Challenge.cs",
+     "line": 442
+    },
+    "nonFlagWaveCountDown": {
+     "baseTicks": 2500,
+     "randomExtraMaxExclusive": 600,
+     "note": "2500 + RandomNumbers.NextNumber(600)",
+     "_source": {
+      "file": "Lawn/Board.cs",
+      "line": 7427
+     }
+    },
+    "flagWaveCountDownTicks": null,
+    "flagWaveCountDownNote": "Wall-nut Bowling never uses the 4500 flag countdown (flag variable in UpdateZombieSpawning) - it falls through to the normal formula.",
+    "healthToNextWaveFractionRange": [
+     0.5,
+     0.65
+    ],
+    "healthShortcut": {
+     "minWaveAgeTicks": 400,
+     "minCountDownTicks": 200,
+     "note": "if the previous wave's remaining total HP <= mZombieHealthToNextWave and the countdown is still > 200, the countdown is shortened to 200"
+    },
+    "hugeWaveCountDownTicks": 750,
+    "hugeWaveTrigger": "mZombieCountDown == 5 on a flag wave; after the 750-tick warning the current wave spawns next (countdown set to 1)",
+    "finalWaveSoundDelayTicks": 60,
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 7297
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 2601
+     }
+    ]
+   },
+   "introducedZombie": null,
+   "allowedZombies": [
+    {
+     "zombieType": "Normal",
+     "zombieValue": 1,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    },
+    {
+     "zombieType": "TrafficCone",
+     "zombieValue": 2,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    }
+   ],
+   "waves": [
+    {
+     "index": 0,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 4,
+     "zombiePointsBeforeRandomPicks": 4,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 1,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 4,
+     "zombiePointsBeforeRandomPicks": 4,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "TrafficCone"
+     ],
+     "counts": {
+      "Normal": 2,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 2,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 4,
+     "zombiePointsBeforeRandomPicks": 4,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "TrafficCone"
+     ],
+     "counts": {
+      "TrafficCone": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 3,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 4,
+     "zombiePointsBeforeRandomPicks": 8,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Normal",
+      "TrafficCone",
+      "Normal",
+      "TrafficCone"
+     ],
+     "counts": {
+      "Normal": 2,
+      "TrafficCone": 3
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 4,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 4,
+     "zombiePointsBeforeRandomPicks": 8,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "TrafficCone"
+     ],
+     "counts": {
+      "Normal": 4,
+      "TrafficCone": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 5,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 4,
+     "zombiePointsBeforeRandomPicks": 8,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Normal",
+      "Normal",
+      "TrafficCone",
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 4,
+      "TrafficCone": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 6,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 4,
+     "zombiePointsBeforeRandomPicks": 12,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal",
+      "TrafficCone",
+      "TrafficCone",
+      "TrafficCone",
+      "Normal",
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 6,
+      "TrafficCone": 3
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 7,
+     "flag": true,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 2.5,
+     "modePointMultiplier": 4,
+     "zombiePointsBeforeRandomPicks": 10,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal",
+      "Flag",
+      "TrafficCone",
+      "Normal",
+      "TrafficCone",
+      "TrafficCone",
+      "TrafficCone",
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Flag": 1,
+      "Normal": 5,
+      "TrafficCone": 5
+     },
+     "forced": {
+      "flagEscortNormals": 3,
+      "flagZombie": true,
+      "introduced": null,
+      "missingZombies": [
+       "TrafficCone"
+      ]
+     }
+    }
+   ],
+   "waveRngCalls": 40,
+   "special": {
+    "prePlantedPlants": [
+     {
+      "gridX": 5,
+      "gridY": 1,
+      "seedType": "Peashooter"
+     },
+     {
+      "gridX": 7,
+      "gridY": 2,
+      "seedType": "Peashooter"
+     },
+     {
+      "gridX": 6,
+      "gridY": 3,
+      "seedType": "Peashooter"
+     }
+    ],
+    "_source": {
+     "file": "Lawn/Challenge.cs",
+     "line": 3311
+    }
+   },
+   "_source": [
+    {
+     "file": "Lawn/Board.cs",
+     "line": 1571
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 8392
+    }
+   ]
+  },
+  {
+   "level": 6,
+   "stage": "1-6",
+   "world": 1,
+   "worldSub": 6,
+   "gameMode": "Adventure",
+   "firstTimeAdventure": true,
+   "background": {
+    "type": "Num1Day",
+    "imageResource": "IMAGE_BACKGROUND1",
+    "resourcePath": "images/background1_hd",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9383
+    }
+   },
+   "startingSun": 50,
+   "startingSunNote": "Board.InitLevel: 150 for first-time level 1, otherwise 50",
+   "seedBank": {
+    "kind": "fixed",
+    "packets": [
+     "Peashooter",
+     "Sunflower",
+     "Cherrybomb",
+     "Wallnut",
+     "Potatomine"
+    ],
+    "numPackets": 5,
+    "chooseSeedsOnCurrentLevel": false,
+    "note": "First-time Adventure levels 1-7 skip the seed chooser; the bank receives SeedType values 0..numPackets-1 in enum order (Board.InitLevel Board.cs:1854). numPackets is limited by GetSeedsAvailable() on a fresh profile.",
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 5259
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 5351
+     }
+    ]
+   },
+   "numWaves": 10,
+   "flagWaves": [
+    9
+   ],
+   "wavesPerFlag": 10,
+   "progressMeter": {
+    "hasFlags": true,
+    "wavesPerFlag": 10,
+    "totalWidthPixels": 150,
+    "flagNotchPixels": 12,
+    "note": "Board.UpdateProgressMeter / DrawProgressMeter; mProgressMeterWidth in pixels",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9096
+    }
+   },
+   "zombieSpawning": {
+    "initialWaveCountDownTicks": 1800,
+    "initialWaveCountDownNote": "default (Board.InitZombieWaves)",
+    "initialWaveCountDownSource": {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    "nonFlagWaveCountDown": {
+     "baseTicks": 2500,
+     "randomExtraMaxExclusive": 600,
+     "note": "2500 + RandomNumbers.NextNumber(600)",
+     "_source": {
+      "file": "Lawn/Board.cs",
+      "line": 7427
+     }
+    },
+    "flagWaveCountDownTicks": 4500,
+    "flagWaveCountDownNote": "set when the just-spawned wave was a flag wave",
+    "healthToNextWaveFractionRange": [
+     0.5,
+     0.65
+    ],
+    "healthShortcut": {
+     "minWaveAgeTicks": 400,
+     "minCountDownTicks": 200,
+     "note": "if the previous wave's remaining total HP <= mZombieHealthToNextWave and the countdown is still > 200, the countdown is shortened to 200"
+    },
+    "hugeWaveCountDownTicks": 750,
+    "hugeWaveTrigger": "mZombieCountDown == 5 on a flag wave; after the 750-tick warning the current wave spawns next (countdown set to 1)",
+    "finalWaveSoundDelayTicks": 60,
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 7297
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 2601
+     }
+    ]
+   },
+   "introducedZombie": "Polevaulter",
+   "allowedZombies": [
+    {
+     "zombieType": "Normal",
+     "zombieValue": 1,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    },
+    {
+     "zombieType": "TrafficCone",
+     "zombieValue": 2,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    },
+    {
+     "zombieType": "Polevaulter",
+     "zombieValue": 2,
+     "firstAllowedWave": 5,
+     "pickWeight": 2000
+    }
+   ],
+   "waves": [
+    {
+     "index": 0,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 1,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 2,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 3,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone"
+     ],
+     "counts": {
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 4,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 5,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 0,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Polevaulter"
+     ],
+     "counts": {
+      "Polevaulter": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": "Polevaulter",
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 6,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "TrafficCone"
+     ],
+     "counts": {
+      "Normal": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 7,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 8,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 9,
+     "flag": true,
+     "initialZombiePoints": 4,
+     "flagPointMultiplier": 2.5,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Flag",
+      "Polevaulter",
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Flag": 1,
+      "Normal": 5,
+      "Polevaulter": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 4,
+      "flagZombie": true,
+      "introduced": "Polevaulter",
+      "missingZombies": [
+       "TrafficCone"
+      ]
+     }
+    }
+   ],
+   "waveRngCalls": 13,
+   "special": null,
+   "_source": [
+    {
+     "file": "Lawn/Board.cs",
+     "line": 1571
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 8392
+    }
+   ]
+  },
+  {
+   "level": 7,
+   "stage": "1-7",
+   "world": 1,
+   "worldSub": 7,
+   "gameMode": "Adventure",
+   "firstTimeAdventure": true,
+   "background": {
+    "type": "Num1Day",
+    "imageResource": "IMAGE_BACKGROUND1",
+    "resourcePath": "images/background1_hd",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9383
+    }
+   },
+   "startingSun": 50,
+   "startingSunNote": "Board.InitLevel: 150 for first-time level 1, otherwise 50",
+   "seedBank": {
+    "kind": "fixed",
+    "packets": [
+     "Peashooter",
+     "Sunflower",
+     "Cherrybomb",
+     "Wallnut",
+     "Potatomine",
+     "Snowpea"
+    ],
+    "numPackets": 6,
+    "chooseSeedsOnCurrentLevel": false,
+    "note": "First-time Adventure levels 1-7 skip the seed chooser; the bank receives SeedType values 0..numPackets-1 in enum order (Board.InitLevel Board.cs:1854). numPackets is limited by GetSeedsAvailable() on a fresh profile.",
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 5259
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 5351
+     }
+    ]
+   },
+   "numWaves": 20,
+   "flagWaves": [
+    9,
+    19
+   ],
+   "wavesPerFlag": 10,
+   "progressMeter": {
+    "hasFlags": true,
+    "wavesPerFlag": 10,
+    "totalWidthPixels": 150,
+    "flagNotchPixels": 12,
+    "note": "Board.UpdateProgressMeter / DrawProgressMeter; mProgressMeterWidth in pixels",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9096
+    }
+   },
+   "zombieSpawning": {
+    "initialWaveCountDownTicks": 1800,
+    "initialWaveCountDownNote": "default (Board.InitZombieWaves)",
+    "initialWaveCountDownSource": {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    "nonFlagWaveCountDown": {
+     "baseTicks": 2500,
+     "randomExtraMaxExclusive": 600,
+     "note": "2500 + RandomNumbers.NextNumber(600)",
+     "_source": {
+      "file": "Lawn/Board.cs",
+      "line": 7427
+     }
+    },
+    "flagWaveCountDownTicks": 4500,
+    "flagWaveCountDownNote": "set when the just-spawned wave was a flag wave",
+    "healthToNextWaveFractionRange": [
+     0.5,
+     0.65
+    ],
+    "healthShortcut": {
+     "minWaveAgeTicks": 400,
+     "minCountDownTicks": 200,
+     "note": "if the previous wave's remaining total HP <= mZombieHealthToNextWave and the countdown is still > 200, the countdown is shortened to 200"
+    },
+    "hugeWaveCountDownTicks": 750,
+    "hugeWaveTrigger": "mZombieCountDown == 5 on a flag wave; after the 750-tick warning the current wave spawns next (countdown set to 1)",
+    "finalWaveSoundDelayTicks": 60,
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 7297
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 2601
+     }
+    ]
+   },
+   "introducedZombie": null,
+   "allowedZombies": [
+    {
+     "zombieType": "Normal",
+     "zombieValue": 1,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    },
+    {
+     "zombieType": "TrafficCone",
+     "zombieValue": 2,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    },
+    {
+     "zombieType": "Polevaulter",
+     "zombieValue": 2,
+     "firstAllowedWave": 5,
+     "pickWeight": 2000
+    }
+   ],
+   "waves": [
+    {
+     "index": 0,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 1,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 2,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 3,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone"
+     ],
+     "counts": {
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 4,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone"
+     ],
+     "counts": {
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 5,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 6,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "TrafficCone"
+     ],
+     "counts": {
+      "Normal": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 7,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Polevaulter",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "Polevaulter": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 8,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Polevaulter",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "Polevaulter": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 9,
+     "flag": true,
+     "initialZombiePoints": 4,
+     "flagPointMultiplier": 2.5,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 5,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Flag",
+      "TrafficCone",
+      "Normal",
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Flag": 1,
+      "Normal": 7,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 4,
+      "flagZombie": true,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 10,
+     "flag": false,
+     "initialZombiePoints": 4,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 4,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Polevaulter"
+     ],
+     "counts": {
+      "Polevaulter": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 11,
+     "flag": false,
+     "initialZombiePoints": 4,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 4,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Polevaulter",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2,
+      "Polevaulter": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 12,
+     "flag": false,
+     "initialZombiePoints": 5,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 5,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Polevaulter",
+      "Normal",
+      "TrafficCone"
+     ],
+     "counts": {
+      "Normal": 1,
+      "Polevaulter": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 13,
+     "flag": false,
+     "initialZombiePoints": 5,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 5,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "TrafficCone": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 14,
+     "flag": false,
+     "initialZombiePoints": 5,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 5,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 3,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 15,
+     "flag": false,
+     "initialZombiePoints": 6,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 6,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "TrafficCone",
+      "Normal",
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 4,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 16,
+     "flag": false,
+     "initialZombiePoints": 6,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 6,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "TrafficCone",
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2,
+      "TrafficCone": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 17,
+     "flag": false,
+     "initialZombiePoints": 6,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 6,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Polevaulter",
+      "Normal",
+      "Polevaulter",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2,
+      "Polevaulter": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 18,
+     "flag": false,
+     "initialZombiePoints": 7,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 7,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "TrafficCone",
+      "Normal",
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 3,
+      "TrafficCone": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 19,
+     "flag": true,
+     "initialZombiePoints": 7,
+     "flagPointMultiplier": 2.5,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 5,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Flag",
+      "TrafficCone",
+      "Polevaulter",
+      "Polevaulter",
+      "Polevaulter",
+      "Normal"
+     ],
+     "counts": {
+      "Flag": 1,
+      "Normal": 8,
+      "Polevaulter": 3,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 7,
+      "flagZombie": true,
+      "introduced": null,
+      "missingZombies": [
+       "TrafficCone",
+       "Polevaulter"
+      ]
+     }
+    }
+   ],
+   "waveRngCalls": 53,
+   "special": null,
+   "_source": [
+    {
+     "file": "Lawn/Board.cs",
+     "line": 1571
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 8392
+    }
+   ]
+  },
+  {
+   "level": 8,
+   "stage": "1-8",
+   "world": 1,
+   "worldSub": 8,
+   "gameMode": "Adventure",
+   "firstTimeAdventure": true,
+   "background": {
+    "type": "Num1Day",
+    "imageResource": "IMAGE_BACKGROUND1",
+    "resourcePath": "images/background1_hd",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9383
+    }
+   },
+   "startingSun": 50,
+   "startingSunNote": "Board.InitLevel: 150 for first-time level 1, otherwise 50",
+   "seedBank": {
+    "kind": "playerChosen",
+    "packets": null,
+    "numPackets": 6,
+    "chooserOffers": [
+     "Peashooter",
+     "Sunflower",
+     "Cherrybomb",
+     "Wallnut",
+     "Potatomine",
+     "Snowpea",
+     "Chomper",
+     "Endoflame"
+    ],
+    "chooserOffersNote": "Offers assume a fresh profile (no store purchases) and the current Adventure level; HasSeedType() is index-based: SeedType < GetSeedsAvailable() plus Endoflame. Player picks numPackets of these.",
+    "chooseSeedsOnCurrentLevel": true,
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 5259
+     },
+     {
+      "file": "Lawn/LawnApp.cs",
+      "line": 2493
+     }
+    ]
+   },
+   "numWaves": 10,
+   "flagWaves": [
+    9
+   ],
+   "wavesPerFlag": 10,
+   "progressMeter": {
+    "hasFlags": true,
+    "wavesPerFlag": 10,
+    "totalWidthPixels": 150,
+    "flagNotchPixels": 12,
+    "note": "Board.UpdateProgressMeter / DrawProgressMeter; mProgressMeterWidth in pixels",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9096
+    }
+   },
+   "zombieSpawning": {
+    "initialWaveCountDownTicks": 1800,
+    "initialWaveCountDownNote": "default (Board.InitZombieWaves)",
+    "initialWaveCountDownSource": {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    "nonFlagWaveCountDown": {
+     "baseTicks": 2500,
+     "randomExtraMaxExclusive": 600,
+     "note": "2500 + RandomNumbers.NextNumber(600)",
+     "_source": {
+      "file": "Lawn/Board.cs",
+      "line": 7427
+     }
+    },
+    "flagWaveCountDownTicks": 4500,
+    "flagWaveCountDownNote": "set when the just-spawned wave was a flag wave",
+    "healthToNextWaveFractionRange": [
+     0.5,
+     0.65
+    ],
+    "healthShortcut": {
+     "minWaveAgeTicks": 400,
+     "minCountDownTicks": 200,
+     "note": "if the previous wave's remaining total HP <= mZombieHealthToNextWave and the countdown is still > 200, the countdown is shortened to 200"
+    },
+    "hugeWaveCountDownTicks": 750,
+    "hugeWaveTrigger": "mZombieCountDown == 5 on a flag wave; after the 750-tick warning the current wave spawns next (countdown set to 1)",
+    "finalWaveSoundDelayTicks": 60,
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 7297
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 2601
+     }
+    ]
+   },
+   "introducedZombie": "Pail",
+   "allowedZombies": [
+    {
+     "zombieType": "Normal",
+     "zombieValue": 1,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    },
+    {
+     "zombieType": "TrafficCone",
+     "zombieValue": 2,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    },
+    {
+     "zombieType": "Pail",
+     "zombieValue": 4,
+     "firstAllowedWave": 1,
+     "pickWeight": 3000
+    }
+   ],
+   "waves": [
+    {
+     "index": 0,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 1,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 2,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 3,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 4,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone"
+     ],
+     "counts": {
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 5,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": -2,
+     "zombiePointsRemaining": -2,
+     "zombies": [
+      "Pail"
+     ],
+     "counts": {
+      "Pail": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": "Pail",
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 6,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 7,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 8,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 3
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 9,
+     "flag": true,
+     "initialZombiePoints": 4,
+     "flagPointMultiplier": 2.5,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": -1,
+     "zombiePointsRemaining": -1,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Flag",
+      "Pail",
+      "TrafficCone"
+     ],
+     "counts": {
+      "Flag": 1,
+      "Normal": 4,
+      "Pail": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 4,
+      "flagZombie": true,
+      "introduced": "Pail",
+      "missingZombies": [
+       "TrafficCone"
+      ]
+     }
+    }
+   ],
+   "waveRngCalls": 13,
+   "special": null,
+   "_source": [
+    {
+     "file": "Lawn/Board.cs",
+     "line": 1571
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 8392
+    }
+   ]
+  },
+  {
+   "level": 9,
+   "stage": "1-9",
+   "world": 1,
+   "worldSub": 9,
+   "gameMode": "Adventure",
+   "firstTimeAdventure": true,
+   "background": {
+    "type": "Num1Day",
+    "imageResource": "IMAGE_BACKGROUND1",
+    "resourcePath": "images/background1_hd",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9383
+    }
+   },
+   "startingSun": 50,
+   "startingSunNote": "Board.InitLevel: 150 for first-time level 1, otherwise 50",
+   "seedBank": {
+    "kind": "playerChosen",
+    "packets": null,
+    "numPackets": 6,
+    "chooserOffers": [
+     "Peashooter",
+     "Sunflower",
+     "Cherrybomb",
+     "Wallnut",
+     "Potatomine",
+     "Snowpea",
+     "Chomper",
+     "Repeater",
+     "Endoflame"
+    ],
+    "chooserOffersNote": "Offers assume a fresh profile (no store purchases) and the current Adventure level; HasSeedType() is index-based: SeedType < GetSeedsAvailable() plus Endoflame. Player picks numPackets of these.",
+    "chooseSeedsOnCurrentLevel": true,
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 5259
+     },
+     {
+      "file": "Lawn/LawnApp.cs",
+      "line": 2493
+     }
+    ]
+   },
+   "numWaves": 20,
+   "flagWaves": [
+    9,
+    19
+   ],
+   "wavesPerFlag": 10,
+   "progressMeter": {
+    "hasFlags": true,
+    "wavesPerFlag": 10,
+    "totalWidthPixels": 150,
+    "flagNotchPixels": 12,
+    "note": "Board.UpdateProgressMeter / DrawProgressMeter; mProgressMeterWidth in pixels",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9096
+    }
+   },
+   "zombieSpawning": {
+    "initialWaveCountDownTicks": 1800,
+    "initialWaveCountDownNote": "default (Board.InitZombieWaves)",
+    "initialWaveCountDownSource": {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    "nonFlagWaveCountDown": {
+     "baseTicks": 2500,
+     "randomExtraMaxExclusive": 600,
+     "note": "2500 + RandomNumbers.NextNumber(600)",
+     "_source": {
+      "file": "Lawn/Board.cs",
+      "line": 7427
+     }
+    },
+    "flagWaveCountDownTicks": 4500,
+    "flagWaveCountDownNote": "set when the just-spawned wave was a flag wave",
+    "healthToNextWaveFractionRange": [
+     0.5,
+     0.65
+    ],
+    "healthShortcut": {
+     "minWaveAgeTicks": 400,
+     "minCountDownTicks": 200,
+     "note": "if the previous wave's remaining total HP <= mZombieHealthToNextWave and the countdown is still > 200, the countdown is shortened to 200"
+    },
+    "hugeWaveCountDownTicks": 750,
+    "hugeWaveTrigger": "mZombieCountDown == 5 on a flag wave; after the 750-tick warning the current wave spawns next (countdown set to 1)",
+    "finalWaveSoundDelayTicks": 60,
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 7297
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 2601
+     }
+    ]
+   },
+   "introducedZombie": null,
+   "allowedZombies": [
+    {
+     "zombieType": "Normal",
+     "zombieValue": 1,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    },
+    {
+     "zombieType": "TrafficCone",
+     "zombieValue": 2,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    },
+    {
+     "zombieType": "Polevaulter",
+     "zombieValue": 2,
+     "firstAllowedWave": 5,
+     "pickWeight": 2000
+    },
+    {
+     "zombieType": "Pail",
+     "zombieValue": 4,
+     "firstAllowedWave": 1,
+     "pickWeight": 3000
+    }
+   ],
+   "waves": [
+    {
+     "index": 0,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 1,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 2,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 3,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone"
+     ],
+     "counts": {
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 4,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 5,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 2,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone"
+     ],
+     "counts": {
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 6,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Polevaulter",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "Polevaulter": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 7,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Polevaulter",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "Polevaulter": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 8,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Polevaulter",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "Polevaulter": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 9,
+     "flag": true,
+     "initialZombiePoints": 4,
+     "flagPointMultiplier": 2.5,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 5,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Flag",
+      "TrafficCone",
+      "Polevaulter",
+      "Normal"
+     ],
+     "counts": {
+      "Flag": 1,
+      "Normal": 5,
+      "Polevaulter": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 4,
+      "flagZombie": true,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 10,
+     "flag": false,
+     "initialZombiePoints": 4,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 4,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 4
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 11,
+     "flag": false,
+     "initialZombiePoints": 4,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 4,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 12,
+     "flag": false,
+     "initialZombiePoints": 5,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 5,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Pail",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "Pail": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 13,
+     "flag": false,
+     "initialZombiePoints": 5,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 5,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Polevaulter",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "Polevaulter": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 14,
+     "flag": false,
+     "initialZombiePoints": 5,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 5,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Pail",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "Pail": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 15,
+     "flag": false,
+     "initialZombiePoints": 6,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 6,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Pail"
+     ],
+     "counts": {
+      "Pail": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 16,
+     "flag": false,
+     "initialZombiePoints": 6,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 6,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "TrafficCone",
+      "Polevaulter"
+     ],
+     "counts": {
+      "Polevaulter": 1,
+      "TrafficCone": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 17,
+     "flag": false,
+     "initialZombiePoints": 6,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 6,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Polevaulter",
+      "Normal",
+      "Normal",
+      "Polevaulter"
+     ],
+     "counts": {
+      "Normal": 2,
+      "Polevaulter": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 18,
+     "flag": false,
+     "initialZombiePoints": 7,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 7,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal",
+      "Pail"
+     ],
+     "counts": {
+      "Normal": 3,
+      "Pail": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 19,
+     "flag": true,
+     "initialZombiePoints": 7,
+     "flagPointMultiplier": 2.5,
+     "modePointMultiplier": 1,
+     "zombiePointsBeforeRandomPicks": 1,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Flag",
+      "TrafficCone",
+      "Polevaulter",
+      "Pail",
+      "Normal"
+     ],
+     "counts": {
+      "Flag": 1,
+      "Normal": 8,
+      "Pail": 1,
+      "Polevaulter": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 7,
+      "flagZombie": true,
+      "introduced": null,
+      "missingZombies": [
+       "TrafficCone",
+       "Polevaulter",
+       "Pail"
+      ]
+     }
+    }
+   ],
+   "waveRngCalls": 44,
+   "special": null,
+   "_source": [
+    {
+     "file": "Lawn/Board.cs",
+     "line": 1571
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 8392
+    }
+   ]
+  },
+  {
+   "level": 10,
+   "stage": "1-10",
+   "world": 1,
+   "worldSub": 10,
+   "gameMode": "Adventure",
+   "firstTimeAdventure": true,
+   "background": {
+    "type": "Num1Day",
+    "imageResource": "IMAGE_BACKGROUND1",
+    "resourcePath": "images/background1_hd",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9383
+    }
+   },
+   "startingSun": 50,
+   "startingSunNote": "Board.InitLevel: 150 for first-time level 1, otherwise 50",
+   "seedBank": {
+    "kind": "conveyor",
+    "packets": null,
+    "numPackets": 10,
+    "initialCards": [],
+    "cardPool": [
+     {
+      "seed": "Peashooter",
+      "weight": 20
+     },
+     {
+      "seed": "Cherrybomb",
+      "weight": 20
+     },
+     {
+      "seed": "Wallnut",
+      "weight": 15
+     },
+     {
+      "seed": "Repeater",
+      "weight": 20
+     },
+     {
+      "seed": "Snowpea",
+      "weight": 10
+     },
+     {
+      "seed": "Chomper",
+      "weight": 5
+     },
+     {
+      "seed": "Potatomine",
+      "weight": 10
+     }
+    ],
+    "firstCardCountDownTicks": 0,
+    "replenishCountDownTicks": {
+     "emptyBelt": 400,
+     "gt4Cards": 425,
+     "gt6Cards": 500,
+     "gt8Cards": 1000,
+     "_note": "Challenge.UpdateConveyorBelt() (Challenge.cs:3669); counter decrements once per tick.",
+     "_source": {
+      "file": "Lawn/Challenge.cs",
+      "line": 3669
+     }
+    },
+    "special": "MiniBoss",
+    "note": "Adventure 1-10 is a mini-boss conveyor level: conveyor belt seed bank, no hand-picked seeds.",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 11866
+    }
+   },
+   "numWaves": 20,
+   "flagWaves": [
+    9,
+    19
+   ],
+   "wavesPerFlag": 10,
+   "progressMeter": {
+    "hasFlags": true,
+    "wavesPerFlag": 10,
+    "totalWidthPixels": 150,
+    "flagNotchPixels": 12,
+    "note": "Board.UpdateProgressMeter / DrawProgressMeter; mProgressMeterWidth in pixels",
+    "_source": {
+     "file": "Lawn/Board.cs",
+     "line": 9096
+    }
+   },
+   "zombieSpawning": {
+    "initialWaveCountDownTicks": 1800,
+    "initialWaveCountDownNote": "default (Board.InitZombieWaves)",
+    "initialWaveCountDownSource": {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    "nonFlagWaveCountDown": {
+     "baseTicks": 2500,
+     "randomExtraMaxExclusive": 600,
+     "note": "2500 + RandomNumbers.NextNumber(600)",
+     "_source": {
+      "file": "Lawn/Board.cs",
+      "line": 7427
+     }
+    },
+    "flagWaveCountDownTicks": 4500,
+    "flagWaveCountDownNote": "set when the just-spawned wave was a flag wave",
+    "healthToNextWaveFractionRange": [
+     0.5,
+     0.65
+    ],
+    "healthShortcut": {
+     "minWaveAgeTicks": 400,
+     "minCountDownTicks": 200,
+     "note": "if the previous wave's remaining total HP <= mZombieHealthToNextWave and the countdown is still > 200, the countdown is shortened to 200"
+    },
+    "hugeWaveCountDownTicks": 750,
+    "hugeWaveTrigger": "mZombieCountDown == 5 on a flag wave; after the 750-tick warning the current wave spawns next (countdown set to 1)",
+    "finalWaveSoundDelayTicks": 60,
+    "_source": [
+     {
+      "file": "Lawn/Board.cs",
+      "line": 7297
+     },
+     {
+      "file": "Lawn/Board.cs",
+      "line": 2601
+     }
+    ]
+   },
+   "introducedZombie": null,
+   "allowedZombies": [
+    {
+     "zombieType": "Normal",
+     "zombieValue": 1,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    },
+    {
+     "zombieType": "TrafficCone",
+     "zombieValue": 2,
+     "firstAllowedWave": 1,
+     "pickWeight": 4000
+    },
+    {
+     "zombieType": "Polevaulter",
+     "zombieValue": 2,
+     "firstAllowedWave": 5,
+     "pickWeight": 2000
+    },
+    {
+     "zombieType": "Pail",
+     "zombieValue": 4,
+     "firstAllowedWave": 1,
+     "pickWeight": 3000
+    }
+   ],
+   "waves": [
+    {
+     "index": 0,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "TrafficCone"
+     ],
+     "counts": {
+      "Normal": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 1,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "TrafficCone"
+     ],
+     "counts": {
+      "Normal": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 2,
+     "flag": false,
+     "initialZombiePoints": 1,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 3,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 3
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 3,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 6,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Pail",
+      "TrafficCone"
+     ],
+     "counts": {
+      "Pail": 1,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 4,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 6,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Pail",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2,
+      "Pail": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 5,
+     "flag": false,
+     "initialZombiePoints": 2,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 6,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Normal",
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2,
+      "TrafficCone": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 6,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 9,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "TrafficCone",
+      "TrafficCone",
+      "Normal",
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 3,
+      "TrafficCone": 3
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 7,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 9,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Pail",
+      "Pail",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "Pail": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 8,
+     "flag": false,
+     "initialZombiePoints": 3,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 9,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Pail",
+      "Pail",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "Pail": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 9,
+     "flag": true,
+     "initialZombiePoints": 4,
+     "flagPointMultiplier": 2.5,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 15,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Flag",
+      "TrafficCone",
+      "TrafficCone",
+      "Normal",
+      "Normal",
+      "Polevaulter",
+      "TrafficCone",
+      "Polevaulter",
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Flag": 1,
+      "Normal": 7,
+      "Polevaulter": 2,
+      "TrafficCone": 4
+     },
+     "forced": {
+      "flagEscortNormals": 4,
+      "flagZombie": true,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 10,
+     "flag": false,
+     "initialZombiePoints": 4,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 12,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Pail",
+      "Normal",
+      "Normal",
+      "Normal",
+      "TrafficCone",
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 4,
+      "Pail": 1,
+      "TrafficCone": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 11,
+     "flag": false,
+     "initialZombiePoints": 4,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 12,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Polevaulter",
+      "TrafficCone",
+      "TrafficCone",
+      "Normal",
+      "TrafficCone",
+      "TrafficCone",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 2,
+      "Polevaulter": 1,
+      "TrafficCone": 4
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 12,
+     "flag": false,
+     "initialZombiePoints": 5,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 15,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "TrafficCone",
+      "Pail",
+      "Pail",
+      "Pail",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 1,
+      "Pail": 3,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 13,
+     "flag": false,
+     "initialZombiePoints": 5,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 15,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Pail",
+      "Normal",
+      "TrafficCone",
+      "TrafficCone",
+      "Polevaulter",
+      "TrafficCone",
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 3,
+      "Pail": 1,
+      "Polevaulter": 1,
+      "TrafficCone": 3
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 14,
+     "flag": false,
+     "initialZombiePoints": 5,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 15,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Pail",
+      "Normal",
+      "Pail",
+      "Polevaulter",
+      "TrafficCone",
+      "TrafficCone"
+     ],
+     "counts": {
+      "Normal": 1,
+      "Pail": 2,
+      "Polevaulter": 1,
+      "TrafficCone": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 15,
+     "flag": false,
+     "initialZombiePoints": 6,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 18,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Polevaulter",
+      "TrafficCone",
+      "Normal",
+      "Pail",
+      "TrafficCone",
+      "Pail",
+      "Normal",
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 4,
+      "Pail": 2,
+      "Polevaulter": 1,
+      "TrafficCone": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 16,
+     "flag": false,
+     "initialZombiePoints": 6,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 18,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Polevaulter",
+      "Normal",
+      "Pail",
+      "TrafficCone",
+      "Pail",
+      "TrafficCone",
+      "Normal",
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 4,
+      "Pail": 2,
+      "Polevaulter": 1,
+      "TrafficCone": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 17,
+     "flag": false,
+     "initialZombiePoints": 6,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 18,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Polevaulter",
+      "Pail",
+      "Normal",
+      "Polevaulter",
+      "Normal",
+      "TrafficCone",
+      "Pail",
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Normal": 4,
+      "Pail": 2,
+      "Polevaulter": 2,
+      "TrafficCone": 1
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 18,
+     "flag": false,
+     "initialZombiePoints": 7,
+     "flagPointMultiplier": 1.0,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 21,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Pail",
+      "Normal",
+      "TrafficCone",
+      "Normal",
+      "TrafficCone",
+      "Pail",
+      "Normal",
+      "Pail",
+      "Polevaulter"
+     ],
+     "counts": {
+      "Normal": 3,
+      "Pail": 3,
+      "Polevaulter": 1,
+      "TrafficCone": 2
+     },
+     "forced": {
+      "flagEscortNormals": 0,
+      "flagZombie": false,
+      "introduced": null,
+      "missingZombies": []
+     }
+    },
+    {
+     "index": 19,
+     "flag": true,
+     "initialZombiePoints": 7,
+     "flagPointMultiplier": 2.5,
+     "modePointMultiplier": 3,
+     "zombiePointsBeforeRandomPicks": 19,
+     "zombiePointsRemaining": 0,
+     "zombies": [
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Flag",
+      "TrafficCone",
+      "Polevaulter",
+      "Pail",
+      "Pail",
+      "Normal",
+      "Normal",
+      "TrafficCone",
+      "Normal",
+      "Normal",
+      "Normal",
+      "Polevaulter",
+      "TrafficCone",
+      "Polevaulter",
+      "Normal",
+      "Normal"
+     ],
+     "counts": {
+      "Flag": 1,
+      "Normal": 14,
+      "Pail": 2,
+      "Polevaulter": 3,
+      "TrafficCone": 3
+     },
+     "forced": {
+      "flagEscortNormals": 7,
+      "flagZombie": true,
+      "introduced": null,
+      "missingZombies": [
+       "TrafficCone",
+       "Polevaulter",
+       "Pail"
+      ]
+     }
+    }
+   ],
+   "waveRngCalls": 118,
+   "special": null,
+   "_source": [
+    {
+     "file": "Lawn/Board.cs",
+     "line": 1571
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 9864
+    },
+    {
+     "file": "Lawn/Board.cs",
+     "line": 8392
+    }
+   ]
+  }
+ ]
+}

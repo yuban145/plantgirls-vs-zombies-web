@@ -1,0 +1,560 @@
+{
+ "_schema": {
+  "tickMilliseconds": 10,
+  "ticksPerSecond": 100,
+  "description": "zombies needed by Adventure Day levels 1-10 (Normal, Flag, Conehead/TrafficCone, Buckethead/Pail, Polevaulter)",
+  "units": "all *_Ticks values are game updates (1 tick = 10 ms, 100 ticks/s); speed is px/tick of horizontal movement (mPosX -= mVelX)",
+  "fields": {
+   "bodyHealth": "Zombie.GetBaseBodyHealth",
+   "helmHealth": "Zombie.GetBaseHelmHealth (armour absorbed before body)",
+   "totalHealth": "bodyHealth + helmHealth",
+   "speed": "Zombie.PickRandomSpeed (px/tick)",
+   "eating": "Zombie.CheckIfPreyCaught/EatPlant: TICKS_BETWEEN_EATS damage every TICKS_BETWEEN_EATS ticks",
+   "zombieValue": "wave point cost (ZombieDefinition.mZombieValue)",
+   "firstAllowedWave": "1-based wave number gate in Board.PickZombieType",
+   "startingLevel": "first Adventure level the type may spawn on",
+   "pickWeight": "weight in Board.PickZombieType; 0 = never picked"
+  }
+ },
+ "_meta": {
+  "game": "PlantGirlsVsZombies (PGvZ 1.3.2)",
+  "generatedBy": "plangirls-web/tools/extract_levels.py",
+  "sourceRoot": "D:\\逆向\\output\\PlantGirlsVsZombies\\decompiled\\Lawn"
+ },
+ "_sourceTables": {
+  "zombieDefinitions": {
+   "file": "Lawn/GameConstants.cs",
+   "line": 1217
+  },
+  "zombieAllowedLevels": {
+   "file": "Lawn/GameConstants.cs",
+   "line": 797
+  },
+  "reanimations": {
+   "file": "Lawn/GameConstants.cs",
+   "line": 149
+  },
+  "bodyHealth": {
+   "file": "Lawn/Zombie.cs",
+   "line": 12179
+  },
+  "helmHealth": {
+   "file": "Lawn/Zombie.cs",
+   "line": 12231
+  },
+  "speed": {
+   "file": "Lawn/Zombie.cs",
+   "line": 2473
+  },
+  "walking": {
+   "file": "Lawn/Zombie.cs",
+   "line": 3844
+  },
+  "eating": {
+   "file": "Lawn/GameConstants.cs",
+   "line": 1178
+  },
+  "chill": {
+   "file": "Lawn/Zombie.cs",
+   "line": 2259
+  }
+ },
+ "zombies": [
+  {
+   "zombieType": "Normal",
+   "aliases": [
+    "Basic",
+    "BasicZombie"
+   ],
+   "displayNameKey": "ZOMBIE",
+   "localizedNames": {
+    "en": "Zombie",
+    "zh_cn": "普通僵尸"
+   },
+   "zombieValue": 1,
+   "startingLevel": 1,
+   "firstAllowedWave": 1,
+   "pickWeight": 4000,
+   "bodyHealth": 270,
+   "helmHealth": 0,
+   "totalHealth": 270,
+   "flyingHealth": 0,
+   "speed": {
+    "kind": "randomRange",
+    "minPxPerTick": 0.23,
+    "maxPxPerTick": 0.37,
+    "minPxPerSecond": 23.0,
+    "maxPxPerSecond": 37.0,
+    "chilledFactor": 0.4
+   },
+   "eating": {
+    "damagePerBite": 4,
+    "biteIntervalTicks": 4,
+    "chilledBiteIntervalTicks": 8,
+    "damagePerSecond": 100.0,
+    "_source": [
+     {
+      "file": "Lawn/Zombie.cs",
+      "line": 1214
+     },
+     {
+      "file": "Lawn/Zombie.cs",
+      "line": 1282
+     },
+     {
+      "file": "Lawn/GameConstants.cs",
+      "line": 1178
+     }
+    ]
+   },
+   "walkIntoHouseSpeedMultiplier": 2,
+   "chillDurationTicks": 1000,
+   "iceTrapChillDurationTicks": 2000,
+   "special": null,
+   "_source": {
+    "definition": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 1219
+    },
+    "initialize": {
+     "file": "Lawn/Zombie.cs",
+     "line": 299
+    },
+    "health": {
+     "file": "Lawn/Zombie.cs",
+     "line": 12179
+    },
+    "helm": {
+     "file": "Lawn/Zombie.cs",
+     "line": 12231
+    },
+    "speed": {
+     "file": "Lawn/Zombie.cs",
+     "line": 2473
+    }
+   },
+   "reanimation": {
+    "type": "Zombie",
+    "resourcePath": "reanim/Zombie",
+    "isSpine": false,
+    "legacyResourcePath": null,
+    "spineScale": null
+   },
+   "rects": {
+    "zombieRect": [
+     36,
+     0,
+     42,
+     115
+    ],
+    "attackRect": [
+     50,
+     0,
+     20,
+     115
+    ],
+    "note": "Zombie.ZombieInitialize defaults (Zombie.cs:345-346); Polevaulter overrides attackRect to (-29,0,70,115) before vault"
+   }
+  },
+  {
+   "zombieType": "Flag",
+   "aliases": [
+    "FlagZombie"
+   ],
+   "displayNameKey": "FLAG_ZOMBIE",
+   "localizedNames": {
+    "en": "Flag Zombie",
+    "zh_cn": "旗子僵尸"
+   },
+   "zombieValue": 1,
+   "startingLevel": 1,
+   "firstAllowedWave": 1,
+   "pickWeight": 0,
+   "bodyHealth": 270,
+   "helmHealth": 0,
+   "totalHealth": 270,
+   "flyingHealth": 0,
+   "speed": {
+    "kind": "fixed",
+    "pxPerTick": 0.45,
+    "pxPerSecond": 45.0,
+    "chilledFactor": 0.4
+   },
+   "eating": {
+    "damagePerBite": 4,
+    "biteIntervalTicks": 4,
+    "chilledBiteIntervalTicks": 8,
+    "damagePerSecond": 100.0,
+    "_source": [
+     {
+      "file": "Lawn/Zombie.cs",
+      "line": 1214
+     },
+     {
+      "file": "Lawn/Zombie.cs",
+      "line": 1282
+     },
+     {
+      "file": "Lawn/GameConstants.cs",
+      "line": 1178
+     }
+    ]
+   },
+   "walkIntoHouseSpeedMultiplier": null,
+   "chillDurationTicks": 1000,
+   "iceTrapChillDurationTicks": 2000,
+   "special": {
+    "flagBearer": true,
+    "note": "Flag zombies are never picked by weight (pickWeight=0); PickZombieWaves inserts one per flag wave."
+   },
+   "_source": {
+    "definition": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 1220
+    },
+    "initialize": {
+     "file": "Lawn/Zombie.cs",
+     "line": 299
+    },
+    "health": {
+     "file": "Lawn/Zombie.cs",
+     "line": 12179
+    },
+    "helm": {
+     "file": "Lawn/Zombie.cs",
+     "line": 12231
+    },
+    "speed": {
+     "file": "Lawn/Zombie.cs",
+     "line": 2473
+    }
+   },
+   "reanimation": {
+    "type": "Zombie",
+    "resourcePath": "reanim/Zombie",
+    "isSpine": false,
+    "legacyResourcePath": null,
+    "spineScale": null
+   },
+   "rects": {
+    "zombieRect": [
+     36,
+     0,
+     42,
+     115
+    ],
+    "attackRect": [
+     50,
+     0,
+     20,
+     115
+    ],
+    "note": "Zombie.ZombieInitialize defaults (Zombie.cs:345-346); Polevaulter overrides attackRect to (-29,0,70,115) before vault"
+   }
+  },
+  {
+   "zombieType": "TrafficCone",
+   "aliases": [
+    "Conehead",
+    "ConeheadZombie"
+   ],
+   "displayNameKey": "CONEHEAD_ZOMBIE",
+   "localizedNames": {
+    "en": "Conehead Zombie",
+    "zh_cn": "路障僵尸"
+   },
+   "zombieValue": 2,
+   "startingLevel": 3,
+   "firstAllowedWave": 1,
+   "pickWeight": 4000,
+   "bodyHealth": 270,
+   "helmHealth": 370,
+   "totalHealth": 640,
+   "flyingHealth": 0,
+   "speed": {
+    "kind": "randomRange",
+    "minPxPerTick": 0.23,
+    "maxPxPerTick": 0.37,
+    "minPxPerSecond": 23.0,
+    "maxPxPerSecond": 37.0,
+    "chilledFactor": 0.4
+   },
+   "eating": {
+    "damagePerBite": 4,
+    "biteIntervalTicks": 4,
+    "chilledBiteIntervalTicks": 8,
+    "damagePerSecond": 100.0,
+    "_source": [
+     {
+      "file": "Lawn/Zombie.cs",
+      "line": 1214
+     },
+     {
+      "file": "Lawn/Zombie.cs",
+      "line": 1282
+     },
+     {
+      "file": "Lawn/GameConstants.cs",
+      "line": 1178
+     }
+    ]
+   },
+   "walkIntoHouseSpeedMultiplier": 2,
+   "chillDurationTicks": 1000,
+   "iceTrapChillDurationTicks": 2000,
+   "special": {
+    "helmType": "TrafficCone"
+   },
+   "_source": {
+    "definition": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 1221
+    },
+    "initialize": {
+     "file": "Lawn/Zombie.cs",
+     "line": 299
+    },
+    "health": {
+     "file": "Lawn/Zombie.cs",
+     "line": 12179
+    },
+    "helm": {
+     "file": "Lawn/Zombie.cs",
+     "line": 12231
+    },
+    "speed": {
+     "file": "Lawn/Zombie.cs",
+     "line": 2473
+    }
+   },
+   "reanimation": {
+    "type": "Zombie",
+    "resourcePath": "reanim/Zombie",
+    "isSpine": false,
+    "legacyResourcePath": null,
+    "spineScale": null
+   },
+   "rects": {
+    "zombieRect": [
+     36,
+     0,
+     42,
+     115
+    ],
+    "attackRect": [
+     50,
+     0,
+     20,
+     115
+    ],
+    "note": "Zombie.ZombieInitialize defaults (Zombie.cs:345-346); Polevaulter overrides attackRect to (-29,0,70,115) before vault"
+   }
+  },
+  {
+   "zombieType": "Pail",
+   "aliases": [
+    "Buckethead",
+    "BucketheadZombie"
+   ],
+   "displayNameKey": "BUCKETHEAD_ZOMBIE",
+   "localizedNames": {
+    "en": "Buckethead Zombie",
+    "zh_cn": "铁桶僵尸"
+   },
+   "zombieValue": 4,
+   "startingLevel": 8,
+   "firstAllowedWave": 1,
+   "pickWeight": 3000,
+   "bodyHealth": 270,
+   "helmHealth": 1100,
+   "totalHealth": 1370,
+   "flyingHealth": 0,
+   "speed": {
+    "kind": "randomRange",
+    "minPxPerTick": 0.23,
+    "maxPxPerTick": 0.37,
+    "minPxPerSecond": 23.0,
+    "maxPxPerSecond": 37.0,
+    "chilledFactor": 0.4
+   },
+   "eating": {
+    "damagePerBite": 4,
+    "biteIntervalTicks": 4,
+    "chilledBiteIntervalTicks": 8,
+    "damagePerSecond": 100.0,
+    "_source": [
+     {
+      "file": "Lawn/Zombie.cs",
+      "line": 1214
+     },
+     {
+      "file": "Lawn/Zombie.cs",
+      "line": 1282
+     },
+     {
+      "file": "Lawn/GameConstants.cs",
+      "line": 1178
+     }
+    ]
+   },
+   "walkIntoHouseSpeedMultiplier": 2,
+   "chillDurationTicks": 1000,
+   "iceTrapChillDurationTicks": 2000,
+   "special": {
+    "helmType": "Pail"
+   },
+   "_source": {
+    "definition": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 1223
+    },
+    "initialize": {
+     "file": "Lawn/Zombie.cs",
+     "line": 299
+    },
+    "health": {
+     "file": "Lawn/Zombie.cs",
+     "line": 12179
+    },
+    "helm": {
+     "file": "Lawn/Zombie.cs",
+     "line": 12231
+    },
+    "speed": {
+     "file": "Lawn/Zombie.cs",
+     "line": 2473
+    }
+   },
+   "reanimation": {
+    "type": "Zombie",
+    "resourcePath": "reanim/Zombie",
+    "isSpine": false,
+    "legacyResourcePath": null,
+    "spineScale": null
+   },
+   "rects": {
+    "zombieRect": [
+     36,
+     0,
+     42,
+     115
+    ],
+    "attackRect": [
+     50,
+     0,
+     20,
+     115
+    ],
+    "note": "Zombie.ZombieInitialize defaults (Zombie.cs:345-346); Polevaulter overrides attackRect to (-29,0,70,115) before vault"
+   }
+  },
+  {
+   "zombieType": "Polevaulter",
+   "aliases": [
+    "Polevaulting",
+    "PolevaultingZombie"
+   ],
+   "displayNameKey": "POLE_VAULTING_ZOMBIE",
+   "localizedNames": {
+    "en": "Pole Vaulting Zombie",
+    "zh_cn": "撑杆僵尸"
+   },
+   "zombieValue": 2,
+   "startingLevel": 6,
+   "firstAllowedWave": 5,
+   "pickWeight": 2000,
+   "bodyHealth": 500,
+   "helmHealth": 0,
+   "totalHealth": 500,
+   "flyingHealth": 0,
+   "speed": {
+    "kind": "randomRange",
+    "minPxPerTick": 0.66,
+    "maxPxPerTick": 0.68,
+    "phase": "PolevaulterPreVault",
+    "postVault": "walker (vault velocity is computed from jump distance / animation duration)",
+    "minPxPerSecond": 66.0,
+    "maxPxPerSecond": 68.0,
+    "chilledFactor": 0.4
+   },
+   "eating": {
+    "damagePerBite": 4,
+    "biteIntervalTicks": 4,
+    "chilledBiteIntervalTicks": 8,
+    "damagePerSecond": 100.0,
+    "_source": [
+     {
+      "file": "Lawn/Zombie.cs",
+      "line": 1214
+     },
+     {
+      "file": "Lawn/Zombie.cs",
+      "line": 1282
+     },
+     {
+      "file": "Lawn/GameConstants.cs",
+      "line": 1178
+     }
+    ]
+   },
+   "walkIntoHouseSpeedMultiplier": null,
+   "chillDurationTicks": 1000,
+   "iceTrapChillDurationTicks": 2000,
+   "special": {
+    "vault": {
+     "triggersWhenPlantAhead": true,
+     "vaultPhase": "PolevaulterPreVault -> PolevaulterInVault -> PolevaulterPostVault",
+     "tallnutBlocks": true,
+     "_source": {
+      "file": "Lawn/Zombie.cs",
+      "line": 2534
+     }
+    }
+   },
+   "_source": {
+    "definition": {
+     "file": "Lawn/GameConstants.cs",
+     "line": 1222
+    },
+    "initialize": {
+     "file": "Lawn/Zombie.cs",
+     "line": 299
+    },
+    "health": {
+     "file": "Lawn/Zombie.cs",
+     "line": 12179
+    },
+    "helm": {
+     "file": "Lawn/Zombie.cs",
+     "line": 12231
+    },
+    "speed": {
+     "file": "Lawn/Zombie.cs",
+     "line": 2473
+    }
+   },
+   "reanimation": {
+    "type": "Polevaulter",
+    "resourcePath": "reanim/Zombie_polevaulter",
+    "isSpine": false,
+    "legacyResourcePath": null,
+    "spineScale": null
+   },
+   "rects": {
+    "zombieRect": [
+     36,
+     0,
+     42,
+     115
+    ],
+    "attackRect": [
+     50,
+     0,
+     20,
+     115
+    ],
+    "note": "Zombie.ZombieInitialize defaults (Zombie.cs:345-346); Polevaulter overrides attackRect to (-29,0,70,115) before vault"
+   }
+  }
+ ]
+}
